@@ -1,6 +1,6 @@
 import { Suspense, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, OrbitControls, Environment, ContactShadows } from '@react-three/drei';
+import { useGLTF, OrbitControls, Environment, ContactShadows, Center } from '@react-three/drei';
 import type { Group } from 'three';
 
 function Model() {
@@ -9,61 +9,51 @@ function Model() {
 
   useFrame((_, delta) => {
     if (group.current) {
-      group.current.rotation.y += delta * 0.4;
+      group.current.rotation.y += delta * 0.35;
     }
   });
 
   return (
     <group ref={group}>
-      <primitive object={scene} scale={1.8} position={[0, -1, 0]} />
+      <Center>
+        <primitive object={scene} scale={1.1} />
+      </Center>
     </group>
-  );
-}
-
-function Fallback() {
-  return (
-    <mesh>
-      <sphereGeometry args={[0.5, 32, 32]} />
-      <meshStandardMaterial color="#6366f1" wireframe />
-    </mesh>
   );
 }
 
 export default function ModelViewer() {
   return (
-    <div className="w-full h-full">
-      <Canvas
-        camera={{ position: [0, 1.5, 5], fov: 45 }}
-        gl={{ antialias: true, alpha: true }}
-        style={{ background: 'transparent' }}
-      >
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[5, 5, 5]} intensity={1.2} castShadow />
-        <directionalLight position={[-5, 3, -5]} intensity={0.4} color="#818cf8" />
-        <pointLight position={[0, 3, 0]} intensity={0.8} color="#fbbf24" />
+    <Canvas
+      camera={{ position: [0, 0.8, 7], fov: 38 }}
+      gl={{ antialias: true, alpha: true }}
+      style={{ background: 'transparent' }}
+    >
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[6, 6, 6]} intensity={1.4} castShadow />
+      <directionalLight position={[-4, 2, -4]} intensity={0.5} color="#818cf8" />
+      <pointLight position={[0, 2, 2]} intensity={1} color="#fbbf24" />
 
-        <Suspense fallback={<Fallback />}>
-          <Model />
-          <ContactShadows
-            position={[0, -1.4, 0]}
-            opacity={0.35}
-            scale={8}
-            blur={2}
-            far={4}
-            color="#1e1b4b"
-          />
-          <Environment preset="city" />
-        </Suspense>
-
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          minPolarAngle={Math.PI / 4}
-          maxPolarAngle={Math.PI / 1.8}
-          autoRotate={false}
+      <Suspense fallback={null}>
+        <Model />
+        <ContactShadows
+          position={[0, -0.75, 0]}
+          opacity={0.4}
+          scale={6}
+          blur={2.5}
+          far={3}
+          color="#1e1b4b"
         />
-      </Canvas>
-    </div>
+        <Environment preset="city" />
+      </Suspense>
+
+      <OrbitControls
+        enableZoom={false}
+        enablePan={false}
+        minPolarAngle={Math.PI / 3.5}
+        maxPolarAngle={Math.PI / 2.2}
+      />
+    </Canvas>
   );
 }
 

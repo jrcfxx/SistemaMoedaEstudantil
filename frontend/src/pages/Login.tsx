@@ -20,7 +20,6 @@ export default function Login() {
     }
     setLoading(true);
     setError('');
-    // Placeholder: auth real será implementada na Sprint 03
     await new Promise((r) => setTimeout(r, 800));
     localStorage.setItem('isLoggedIn', 'true');
     navigate('/dashboard');
@@ -28,56 +27,60 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Panel esquerdo – modelo 3D */}
-      <div className="hidden lg:flex w-1/2 bg-sidebar flex-col relative overflow-hidden">
-        {/* Glows de fundo */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-16 left-16 w-72 h-72 bg-gold/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-16 right-16 w-56 h-56 bg-primary-400/20 rounded-full blur-3xl" />
+    <div className="h-screen flex overflow-hidden">
+
+      {/* ── Painel esquerdo ─────────────────────────────────── */}
+      <div className="hidden lg:block w-1/2 bg-sidebar relative overflow-hidden">
+
+        {/* Glows */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-gold/10 rounded-full blur-3xl -translate-x-1/3 -translate-y-1/3" />
+          <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary-500/15 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
         </div>
 
-        {/* Cabeçalho */}
-        <div className="relative z-10 px-12 pt-12 text-center">
-          <h1 className="text-3xl font-bold text-white">Moeda Estudantil</h1>
-          <p className="text-indigo-300 text-sm mt-1 leading-relaxed">
+        {/* Canvas Three.js ocupa o painel inteiro */}
+        <Suspense
+          fallback={
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 className="w-10 h-10 text-indigo-300 animate-spin" />
+            </div>
+          }
+        >
+          <div className="absolute inset-0 z-10">
+            <ModelViewer />
+          </div>
+        </Suspense>
+
+        {/* Título — overlay no topo */}
+        <div className="absolute top-0 inset-x-0 z-20 pt-10 pb-6 px-10 text-center bg-gradient-to-b from-sidebar via-sidebar/80 to-transparent">
+          <h1 className="text-3xl font-bold text-white tracking-tight">Moeda Estudantil</h1>
+          <p className="text-indigo-300 text-sm mt-1 max-w-xs mx-auto leading-relaxed">
             O banco digital universitário que reconhece e recompensa o mérito acadêmico.
           </p>
         </div>
 
-        {/* Canvas 3D */}
-        <div className="flex-1 relative z-10">
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center h-full">
-                <Loader2 className="w-8 h-8 text-indigo-300 animate-spin" />
-              </div>
-            }
-          >
-            <ModelViewer />
-          </Suspense>
-        </div>
-
-        {/* Rodapé com estatísticas */}
-        <div className="relative z-10 px-12 pb-10">
-          <div className="grid grid-cols-3 gap-4">
+        {/* Cards de estatísticas — overlay na base */}
+        <div className="absolute bottom-0 inset-x-0 z-20 pb-8 px-10 pt-6 bg-gradient-to-t from-sidebar via-sidebar/80 to-transparent">
+          <div className="grid grid-cols-3 gap-3">
             {[
               { value: '500+', label: 'Alunos' },
-              { value: '50+', label: 'Empresas' },
-              { value: '10+', label: 'Instituições' },
+              { value: '50+',  label: 'Empresas' },
+              { value: '10+',  label: 'Instituições' },
             ].map(({ value, label }) => (
-              <div key={label} className="bg-indigo-800/50 rounded-xl p-3 text-center">
+              <div key={label} className="bg-indigo-900/60 backdrop-blur-sm rounded-xl p-3 text-center border border-indigo-700/30">
                 <p className="text-gold font-bold text-xl">{value}</p>
-                <p className="text-indigo-300 text-xs">{label}</p>
+                <p className="text-indigo-300 text-xs mt-0.5">{label}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Panel direito */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-slate-50">
+      {/* ── Painel direito ──────────────────────────────────── */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-slate-50 overflow-y-auto">
         <div className="w-full max-w-sm">
+
+          {/* Ícone mobile */}
           <div className="flex lg:hidden justify-center mb-6">
             <div className="bg-primary-100 p-4 rounded-2xl">
               <span className="text-3xl">🪙</span>
@@ -132,7 +135,7 @@ export default function Login() {
               disabled={loading}
               className="btn-primary w-full justify-center py-2.5 mt-2"
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
