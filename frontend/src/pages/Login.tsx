@@ -1,6 +1,8 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Coins, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+
+const ModelViewer = lazy(() => import('../components/ui/ModelViewer'));
 
 export default function Login() {
   const navigate = useNavigate();
@@ -27,29 +29,44 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Panel esquerdo */}
-      <div className="hidden lg:flex w-1/2 bg-sidebar flex-col items-center justify-center p-12 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-64 h-64 bg-gold rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-48 h-48 bg-primary-400 rounded-full blur-3xl" />
+      {/* Panel esquerdo – modelo 3D */}
+      <div className="hidden lg:flex w-1/2 bg-sidebar flex-col relative overflow-hidden">
+        {/* Glows de fundo */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-16 left-16 w-72 h-72 bg-gold/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-16 right-16 w-56 h-56 bg-primary-400/20 rounded-full blur-3xl" />
         </div>
-        <div className="relative z-10 text-center max-w-sm">
-          <div className="flex justify-center mb-6">
-            <div className="bg-gold/20 p-5 rounded-3xl">
-              <Coins className="w-16 h-16 text-gold" />
-            </div>
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-3">Moeda Estudantil</h1>
-          <p className="text-indigo-300 text-lg leading-relaxed">
+
+        {/* Cabeçalho */}
+        <div className="relative z-10 px-12 pt-12 text-center">
+          <h1 className="text-3xl font-bold text-white">Moeda Estudantil</h1>
+          <p className="text-indigo-300 text-sm mt-1 leading-relaxed">
             O banco digital universitário que reconhece e recompensa o mérito acadêmico.
           </p>
-          <div className="mt-10 grid grid-cols-3 gap-4">
+        </div>
+
+        {/* Canvas 3D */}
+        <div className="flex-1 relative z-10">
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-full">
+                <Loader2 className="w-8 h-8 text-indigo-300 animate-spin" />
+              </div>
+            }
+          >
+            <ModelViewer />
+          </Suspense>
+        </div>
+
+        {/* Rodapé com estatísticas */}
+        <div className="relative z-10 px-12 pb-10">
+          <div className="grid grid-cols-3 gap-4">
             {[
               { value: '500+', label: 'Alunos' },
               { value: '50+', label: 'Empresas' },
               { value: '10+', label: 'Instituições' },
             ].map(({ value, label }) => (
-              <div key={label} className="bg-indigo-800/50 rounded-xl p-3">
+              <div key={label} className="bg-indigo-800/50 rounded-xl p-3 text-center">
                 <p className="text-gold font-bold text-xl">{value}</p>
                 <p className="text-indigo-300 text-xs">{label}</p>
               </div>
@@ -63,7 +80,7 @@ export default function Login() {
         <div className="w-full max-w-sm">
           <div className="flex lg:hidden justify-center mb-6">
             <div className="bg-primary-100 p-4 rounded-2xl">
-              <Coins className="w-10 h-10 text-primary-600" />
+              <span className="text-3xl">🪙</span>
             </div>
           </div>
 
