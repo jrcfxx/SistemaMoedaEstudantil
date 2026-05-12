@@ -11,7 +11,10 @@ export const createEmpresaParceiraSchema = z.object({
   status: z.enum(['ATIVA', 'INATIVA']).optional().default('ATIVA'),
 });
 
-export const updateEmpresaParceiraSchema = createEmpresaParceiraSchema.partial();
+export const updateEmpresaParceiraSchema = createEmpresaParceiraSchema
+  .omit({ status: true })
+  .partial()
+  .extend({ status: z.enum(['ATIVA', 'INATIVA']).optional() });
 
 export type CreateEmpresaParceiraInput = z.infer<typeof createEmpresaParceiraSchema>;
 export type UpdateEmpresaParceiraInput = z.infer<typeof updateEmpresaParceiraSchema>;

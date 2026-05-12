@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { GraduationCap, Building2, School, Coins, Clock } from 'lucide-react';
 import { StatCard } from '../components/ui/StatCard';
 import { Spinner } from '../components/ui/Spinner';
@@ -82,9 +83,9 @@ export default function Dashboard() {
               <GraduationCap className="w-5 h-5 text-primary-600" />
               <h3 className="font-semibold text-slate-800">Alunos Recentes</h3>
             </div>
-            <a href="/alunos" className="text-xs text-primary-600 hover:underline font-medium">
+            <Link to="/alunos" className="text-xs text-primary-600 hover:underline font-medium">
               Ver todos
-            </a>
+            </Link>
           </div>
           {stats.recentAlunos.length === 0 ? (
             <p className="text-slate-500 text-sm text-center py-6">Nenhum aluno cadastrado ainda.</p>
@@ -120,9 +121,9 @@ export default function Dashboard() {
               <Building2 className="w-5 h-5 text-blue-600" />
               <h3 className="font-semibold text-slate-800">Empresas Recentes</h3>
             </div>
-            <a href="/empresas" className="text-xs text-primary-600 hover:underline font-medium">
+            <Link to="/empresas" className="text-xs text-primary-600 hover:underline font-medium">
               Ver todas
-            </a>
+            </Link>
           </div>
           {stats.recentEmpresas.length === 0 ? (
             <p className="text-slate-500 text-sm text-center py-6">Nenhuma empresa cadastrada ainda.</p>
