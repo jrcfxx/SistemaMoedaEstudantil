@@ -113,7 +113,7 @@ Cada incremento representa uma entrega funcional ou artefato de projeto vinculad
 | 3 | Diagrama de Classes | Sprint 01 | ✅ Concluído |
 | 4 | Diagrama de Componentes | Sprint 01 | 🔄 Em andamento |
 | 5 | Modelo ER (Entidade-Relacionamento) | Sprint 02 | ⏳ Pendente |
-| 6 | Configuração do banco de dados (PostgreSQL + Docker) | Sprint 02 | ⏳ Pendente |
+| 6 | Configuração do banco de dados (PostgreSQL + Docker) | Sprint 02 | ✅ Concluído |
 | 7 | Camada de persistência com Prisma ORM (schema + migrations) | Sprint 02 | ⏳ Pendente |
 | 8 | CRUD de Aluno — back-end (API REST) | Sprint 02 | ⏳ Pendente |
 | 9 | CRUD de Empresa Parceira — back-end (API REST) | Sprint 02 | ⏳ Pendente |
