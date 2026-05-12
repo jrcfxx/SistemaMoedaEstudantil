@@ -1,12 +1,10 @@
-import { Router } from 'express'
-import { empresaParceiraController } from '../controllers/empresaParceiraController'
+import { Router } from 'express';
+import { empresaParceiraController } from '../controllers/empresaParceiraController';
 
-const router = Router()
+export const empresaParceiraRoutes = Router();
 
-router.get('/', empresaParceiraController.index)
-router.get('/:id', empresaParceiraController.show)
-router.post('/', empresaParceiraController.store)
-router.put('/:id', empresaParceiraController.update)
-router.delete('/:id', empresaParceiraController.destroy)
-
-export default router
+empresaParceiraRoutes.get('/', empresaParceiraController.findAll);
+empresaParceiraRoutes.get('/:id', empresaParceiraController.findById);
+empresaParceiraRoutes.post('/', empresaParceiraController.create);
+empresaParceiraRoutes.put('/:id', empresaParceiraController.update);
+empresaParceiraRoutes.delete('/:id', empresaParceiraController.delete);

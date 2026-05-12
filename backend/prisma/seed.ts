@@ -1,35 +1,29 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Iniciando seed do banco de dados...')
+  console.log('🌱 Iniciando seed...');
 
-  // Instituições pré-cadastradas
-  const instituicoes = [
-    { nome: 'PUC Minas' },
-    { nome: 'UFMG — Universidade Federal de Minas Gerais' },
-    { nome: 'CEFET-MG' },
-    { nome: 'UEMG — Universidade do Estado de Minas Gerais' },
-  ]
+  await prisma.instituicao.deleteMany();
 
-  for (const inst of instituicoes) {
-    await prisma.instituicao.upsert({
-      where: { nome: inst.nome },
-      update: {},
-      create: inst,
-    })
-  }
+  const instituicoes = await Promise.all([
+    prisma.instituicao.create({ data: { nome: 'PUC Minas' } }),
+    prisma.instituicao.create({ data: { nome: 'UFMG - Universidade Federal de Minas Gerais' } }),
+    prisma.instituicao.create({ data: { nome: 'UFOP - Universidade Federal de Ouro Preto' } }),
+    prisma.instituicao.create({ data: { nome: 'CEFET-MG' } }),
+    prisma.instituicao.create({ data: { nome: 'Newton Paiva' } }),
+  ]);
 
-  console.log(`✅ ${instituicoes.length} instituições cadastradas.`)
-  console.log('✅ Seed concluído.')
+  console.log(`✅ ${instituicoes.length} instituições criadas`);
+  console.log('🎉 Seed concluído com sucesso!');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Erro durante o seed:', e)
-    process.exit(1)
+    console.error('❌ Erro no seed:', e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });

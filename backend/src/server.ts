@@ -1,29 +1,36 @@
-import 'dotenv/config'
-import cors from 'cors'
-import express from 'express'
-import { errorHandler } from './middlewares/errorHandler'
-import alunoRoutes from './routes/alunoRoutes'
-import empresaParceiraRoutes from './routes/empresaParceiraRoutes'
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import { alunoRoutes } from './routes/alunoRoutes';
+import { empresaParceiraRoutes } from './routes/empresaParceiraRoutes';
+import { instituicaoRoutes } from './routes/instituicaoRoutes';
+import { dashboardRoutes } from './routes/dashboardRoutes';
+import { errorHandler } from './middlewares/errorHandler';
 
-const app = express()
+const app = express();
+const PORT = process.env.PORT || 3333;
 
-app.use(cors())
-app.use(express.json())
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true,
+  }),
+);
 
-// ── Rotas ──────────────────────────────────────────
+app.use(express.json());
+
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() })
-})
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
-app.use('/api/alunos', alunoRoutes)
-app.use('/api/empresas', empresaParceiraRoutes)
+app.use('/api/alunos', alunoRoutes);
+app.use('/api/empresas-parceiras', empresaParceiraRoutes);
+app.use('/api/instituicoes', instituicaoRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
-// ── Tratamento de erros (deve ser o último middleware) ──
-app.use(errorHandler)
-
-// ── Inicialização ───────────────────────────────────
-const PORT = process.env.PORT ?? 3333
+app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`)
-})
+  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+  console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
+});

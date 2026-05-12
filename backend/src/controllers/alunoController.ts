@@ -1,57 +1,50 @@
-import { NextFunction, Request, Response } from 'express'
-import { alunoService } from '../services/alunoService'
-import { createAlunoSchema, updateAlunoSchema } from '../validators/alunoValidator'
+import { Request, Response, NextFunction } from 'express';
+import { alunoService } from '../services/alunoService';
 
 export const alunoController = {
-  // GET /api/alunos
-  async index(req: Request, res: Response, next: NextFunction) {
+  findAll: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const alunos = await alunoService.listarAlunos()
-      res.json({ data: alunos, total: alunos.length })
-    } catch (err) {
-      next(err)
+      const search = req.query.search as string | undefined;
+      const alunos = await alunoService.findAll(search);
+      res.json(alunos);
+    } catch (error) {
+      next(error);
     }
   },
 
-  // GET /api/alunos/:id
-  async show(req: Request, res: Response, next: NextFunction) {
+  findById: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const aluno = await alunoService.buscarAluno(req.params.id)
-      res.json({ data: aluno })
-    } catch (err) {
-      next(err)
+      const aluno = await alunoService.findById(req.params.id);
+      res.json(aluno);
+    } catch (error) {
+      next(error);
     }
   },
 
-  // POST /api/alunos
-  async store(req: Request, res: Response, next: NextFunction) {
+  create: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const input = createAlunoSchema.parse(req.body)
-      const aluno = await alunoService.criarAluno(input)
-      res.status(201).json({ data: aluno })
-    } catch (err) {
-      next(err)
+      const aluno = await alunoService.create(req.body);
+      res.status(201).json(aluno);
+    } catch (error) {
+      next(error);
     }
   },
 
-  // PUT /api/alunos/:id
-  async update(req: Request, res: Response, next: NextFunction) {
+  update: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const input = updateAlunoSchema.parse(req.body)
-      const aluno = await alunoService.atualizarAluno(req.params.id, input)
-      res.json({ data: aluno })
-    } catch (err) {
-      next(err)
+      const aluno = await alunoService.update(req.params.id, req.body);
+      res.json(aluno);
+    } catch (error) {
+      next(error);
     }
   },
 
-  // DELETE /api/alunos/:id
-  async destroy(req: Request, res: Response, next: NextFunction) {
+  delete: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await alunoService.removerAluno(req.params.id)
-      res.status(204).send()
-    } catch (err) {
-      next(err)
+      await alunoService.delete(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      next(error);
     }
   },
-}
+};

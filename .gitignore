@@ -1,52 +1,12 @@
-# ===== Variáveis de ambiente (NUNCA commitar) =====
-.env
-.env.local
-.env.*.local
-
-# ===== Dependências =====
 node_modules/
-.pnp
-.pnp.js
-
-# ===== Build =====
 dist/
-build/
-out/
-
-# ===== Prisma =====
-# Manter schema.prisma e migrations no git; ignorar apenas o client gerado
-backend/node_modules/.prisma/
-
-# ===== Logs =====
+.env
+*.env.local
+.DS_Store
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-
-# ===== Sistema Operacional =====
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# ===== Editores / IDEs =====
 .vscode/
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# ===== Testes =====
-coverage/
-.nyc_output/
-
-# ===== Temporários =====
-*.tmp
-*.temp
-.cache/
-
-# ===== Docker =====
-# Manter o docker-compose.yml; ignorar volumes locais montados
-docker/volumes/
+*.tsbuildinfo

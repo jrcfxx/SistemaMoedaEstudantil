@@ -1,14 +1,3 @@
-// ============================================================
-//  Sistema de Moeda Estudantil — Schema Prisma
-//  ORM: Prisma 5 | Banco: PostgreSQL 16
-//
-//  Entidades com CRUD implementado nesta sprint (Sprint 02):
-//    - Instituicao, Aluno, EmpresaParceira
-//
-//  Entidades presentes no schema mas sem CRUD (Sprint 03):
-//    - Usuario, Professor, Vantagem, TransacaoMoeda, Resgate
-// ============================================================
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,10 +6,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-// ─────────────────────────────────────────────
-//  ENUMS
-// ─────────────────────────────────────────────
 
 enum TipoUsuario {
   ALUNO
@@ -45,86 +30,14 @@ enum StatusResgate {
   UTILIZADO
 }
 
-// ─────────────────────────────────────────────
-//  SPRINT 02 — Entidades com CRUD
-// ─────────────────────────────────────────────
-
-/// Instituições de ensino pré-cadastradas.
-/// Alunos e professores se vinculam a uma instituição.
-model Instituicao {
-  id         String   @id @default(cuid())
-  nome       String   @unique
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  alunos     Aluno[]
-  professores Professor[]
-
-  @@map("instituicoes")
-}
-
-/// Aluno cadastrado no sistema de moeda estudantil.
-model Aluno {
-  id           String   @id @default(cuid())
-  nome         String
-  email        String   @unique
-  cpf          String   @unique
-  rg           String
-  endereco     String
-  curso        String
-  saldoMoedas  Int      @default(0)
-
-  instituicaoId String
-  instituicao   Instituicao @relation(fields: [instituicaoId], references: [id])
-
-  /// Vínculo com autenticação (criado na Sprint 03)
-  usuarioId    String?  @unique
-  usuario      Usuario? @relation(fields: [usuarioId], references: [id])
-
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  transacoes   TransacaoMoeda[]
-  resgates     Resgate[]
-
-  @@map("alunos")
-}
-
-/// Empresa parceira que oferece vantagens aos alunos.
-model EmpresaParceira {
-  id        String        @id @default(cuid())
-  nome      String
-  email     String        @unique
-  cnpj      String        @unique
-  endereco  String
-  telefone  String?
-  status    StatusEmpresa @default(ATIVA)
-
-  /// Vínculo com autenticação (criado na Sprint 03)
-  usuarioId String?  @unique
-  usuario   Usuario? @relation(fields: [usuarioId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  vantagens Vantagem[]
-
-  @@map("empresas_parceiras")
-}
-
-// ─────────────────────────────────────────────
-//  SPRINT 03 — Entidades no schema (sem CRUD ainda)
-// ─────────────────────────────────────────────
-
-/// Conta de acesso ao sistema (login + senha).
-/// Tipo define se pertence a aluno, professor ou empresa.
 model Usuario {
-  id         String      @id @default(cuid())
-  email      String      @unique
-  senhaHash  String
-  tipo       TipoUsuario
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id        String      @id @default(cuid())
+  nome      String
+  email     String      @unique
+  senhaHash String
+  tipo      TipoUsuario
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
   aluno           Aluno?
   professor       Professor?
@@ -133,83 +46,120 @@ model Usuario {
   @@map("usuarios")
 }
 
-/// Docente pré-cadastrado pela instituição parceira.
-/// Recebe 1.000 moedas por semestre (saldo acumulável).
-model Professor {
-  id           String   @id @default(cuid())
-  nome         String
-  cpf          String   @unique
-  departamento String
-  saldoMoedas  Int      @default(1000)
+model Instituicao {
+  id        String   @id @default(cuid())
+  nome      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  alunos      Aluno[]
+  professores Professor[]
+
+  @@map("instituicoes")
+}
+
+model Aluno {
+  id            String   @id @default(cuid())
+  nome          String
+  email         String   @unique
+  cpf           String   @unique
+  rg            String
+  endereco      String
+  curso         String
+  saldoMoedas   Int      @default(0)
   instituicaoId String
-  instituicao   Instituicao @relation(fields: [instituicaoId], references: [id])
+  usuarioId     String?  @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  usuarioId    String?  @unique
-  usuario      Usuario? @relation(fields: [usuarioId], references: [id])
+  instituicao Instituicao      @relation(fields: [instituicaoId], references: [id])
+  usuario     Usuario?         @relation(fields: [usuarioId], references: [id])
+  transacoes  TransacaoMoeda[]
+  resgates    Resgate[]
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  @@map("alunos")
+}
 
-  transacoesEnviadas TransacaoMoeda[]
+model EmpresaParceira {
+  id        String        @id @default(cuid())
+  nome      String
+  email     String        @unique
+  cnpj      String        @unique
+  endereco  String
+  telefone  String?
+  status    StatusEmpresa @default(ATIVA)
+  usuarioId String?       @unique
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  usuario   Usuario?   @relation(fields: [usuarioId], references: [id])
+  vantagens Vantagem[]
+
+  @@map("empresas_parceiras")
+}
+
+model Professor {
+  id            String   @id @default(cuid())
+  nome          String
+  cpf           String   @unique
+  departamento  String
+  saldoMoedas   Int      @default(1000)
+  instituicaoId String
+  usuarioId     String?  @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  instituicao Instituicao      @relation(fields: [instituicaoId], references: [id])
+  usuario     Usuario?         @relation(fields: [usuarioId], references: [id])
+  transacoes  TransacaoMoeda[]
 
   @@map("professores")
 }
 
-/// Produto, desconto ou benefício oferecido por empresa parceira.
 model Vantagem {
-  id          String   @id @default(cuid())
-  titulo      String
-  descricao   String
-  fotoUrl     String?
-  custoMoedas Int
-
+  id                String   @id @default(cuid())
+  titulo            String
+  descricao         String
+  fotoUrl           String?
+  custoMoedas       Int
   empresaParceiraId String
-  empresaParceira   EmpresaParceira @relation(fields: [empresaParceiraId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  transacoes  TransacaoMoeda[]
-  resgates    Resgate[]
+  empresa    EmpresaParceira  @relation(fields: [empresaParceiraId], references: [id])
+  transacoes TransacaoMoeda[]
+  resgates   Resgate[]
 
   @@map("vantagens")
 }
 
-/// Registro de cada movimentação de moedas no sistema.
 model TransacaoMoeda {
-  id     String        @id @default(cuid())
-  tipo   TipoTransacao
-  valor  Int
-  motivo String
-
+  id          String        @id @default(cuid())
+  tipo        TipoTransacao
+  valor       Int
+  motivo      String
   alunoId     String
-  aluno       Aluno @relation(fields: [alunoId], references: [id])
-
   professorId String?
-  professor   Professor? @relation(fields: [professorId], references: [id])
-
   vantagemId  String?
-  vantagem    Vantagem? @relation(fields: [vantagemId], references: [id])
+  createdAt   DateTime      @default(now())
 
-  createdAt   DateTime @default(now())
+  aluno     Aluno      @relation(fields: [alunoId], references: [id])
+  professor Professor? @relation(fields: [professorId], references: [id])
+  vantagem  Vantagem?  @relation(fields: [vantagemId], references: [id])
 
-  @@map("transacoes_moedas")
+  @@map("transacoes_moeda")
 }
 
-/// Resgate de uma vantagem por um aluno, com geração de cupom único.
 model Resgate {
-  id           String        @id @default(cuid())
-  codigoCupom  String        @unique @default(cuid())
-  status       StatusResgate @default(PENDENTE)
+  id          String        @id @default(cuid())
+  codigoCupom String        @unique
+  status      StatusResgate @default(PENDENTE)
+  alunoId     String
+  vantagemId  String
+  createdAt   DateTime      @default(now())
 
-  alunoId    String
-  aluno      Aluno    @relation(fields: [alunoId], references: [id])
-
-  vantagemId String
-  vantagem   Vantagem @relation(fields: [vantagemId], references: [id])
-
-  createdAt  DateTime @default(now())
+  aluno    Aluno    @relation(fields: [alunoId], references: [id])
+  vantagem Vantagem @relation(fields: [vantagemId], references: [id])
 
   @@map("resgates")
 }

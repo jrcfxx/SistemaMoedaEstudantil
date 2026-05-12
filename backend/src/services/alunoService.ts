@@ -1,70 +1,75 @@
-import { prisma } from '../lib/prisma'
-import { AppError } from '../middlewares/AppError'
-import { alunoRepository } from '../repositories/alunoRepository'
-import { CreateAlunoInput, UpdateAlunoInput } from '../validators/alunoValidator'
+import { alunoRepository } from '../repositories/alunoRepository';
+import { instituicaoRepository } from '../repositories/instituicaoRepository';
+import { AppError } from '../middlewares/errorHandler';
+import {
+  CreateAlunoInput,
+  UpdateAlunoInput,
+  createAlunoSchema,
+  updateAlunoSchema,
+} from '../validators/alunoValidator';
+
+function normalizeCpf(cpf: string): string {
+  return cpf.replace(/\D/g, '');
+}
 
 export const alunoService = {
-  async listarAlunos() {
-    return alunoRepository.findAll()
+  findAll: async (search?: string) => {
+    return alunoRepository.findAll(search);
   },
 
-  async buscarAluno(id: string) {
-    const aluno = await alunoRepository.findById(id)
-    if (!aluno) throw new AppError('Aluno não encontrado', 404)
-    return aluno
+  findById: async (id: string) => {
+    const aluno = await alunoRepository.findById(id);
+    if (!aluno) throw new AppError('Aluno não encontrado', 404);
+    return aluno;
   },
 
-  async criarAluno(data: CreateAlunoInput) {
-    // Verifica se a instituição existe
-    const instituicao = await prisma.instituicao.findUnique({
-      where: { id: data.instituicaoId },
-    })
-    if (!instituicao) throw new AppError('Instituição não encontrada', 404)
+  create: async (data: CreateAlunoInput) => {
+    const parsed = createAlunoSchema.parse(data);
+    parsed.cpf = normalizeCpf(parsed.cpf);
 
-    // Verifica unicidade do e-mail
-    const emailExistente = await alunoRepository.findByEmail(data.email)
-    if (emailExistente) throw new AppError('E-mail já cadastrado', 409)
+    const instituicao = await instituicaoRepository.findById(parsed.instituicaoId);
+    if (!instituicao) throw new AppError('Instituição não encontrada', 404);
 
-    // Verifica unicidade do CPF
-    const cpfExistente = await alunoRepository.findByCpf(data.cpf)
-    if (cpfExistente) throw new AppError('CPF já cadastrado', 409)
+    const emailExistente = await alunoRepository.findByEmail(parsed.email);
+    if (emailExistente) throw new AppError('E-mail já cadastrado', 409);
 
-    return alunoRepository.create(data)
+    const cpfExistente = await alunoRepository.findByCpf(parsed.cpf);
+    if (cpfExistente) throw new AppError('CPF já cadastrado', 409);
+
+    return alunoRepository.create(parsed);
   },
 
-  async atualizarAluno(id: string, data: UpdateAlunoInput) {
-    // Verifica se o aluno existe
-    await alunoService.buscarAluno(id)
+  update: async (id: string, data: UpdateAlunoInput) => {
+    const parsed = updateAlunoSchema.parse(data);
 
-    // Se alterou e-mail, verifica unicidade
-    if (data.email) {
-      const emailExistente = await alunoRepository.findByEmail(data.email)
-      if (emailExistente && emailExistente.id !== id) {
-        throw new AppError('E-mail já cadastrado por outro aluno', 409)
-      }
+    const aluno = await alunoRepository.findById(id);
+    if (!aluno) throw new AppError('Aluno não encontrado', 404);
+
+    if (parsed.cpf) {
+      parsed.cpf = normalizeCpf(parsed.cpf);
     }
 
-    // Se alterou CPF, verifica unicidade
-    if (data.cpf) {
-      const cpfExistente = await alunoRepository.findByCpf(data.cpf)
-      if (cpfExistente && cpfExistente.id !== id) {
-        throw new AppError('CPF já cadastrado por outro aluno', 409)
-      }
+    if (parsed.email && parsed.email !== aluno.email) {
+      const emailExistente = await alunoRepository.findByEmail(parsed.email);
+      if (emailExistente) throw new AppError('E-mail já cadastrado', 409);
     }
 
-    // Se alterou instituição, verifica se existe
-    if (data.instituicaoId) {
-      const instituicao = await prisma.instituicao.findUnique({
-        where: { id: data.instituicaoId },
-      })
-      if (!instituicao) throw new AppError('Instituição não encontrada', 404)
+    if (parsed.cpf && parsed.cpf !== aluno.cpf) {
+      const cpfExistente = await alunoRepository.findByCpf(parsed.cpf);
+      if (cpfExistente) throw new AppError('CPF já cadastrado', 409);
     }
 
-    return alunoRepository.update(id, data)
+    if (parsed.instituicaoId && parsed.instituicaoId !== aluno.instituicaoId) {
+      const instituicao = await instituicaoRepository.findById(parsed.instituicaoId);
+      if (!instituicao) throw new AppError('Instituição não encontrada', 404);
+    }
+
+    return alunoRepository.update(id, parsed);
   },
 
-  async removerAluno(id: string) {
-    await alunoService.buscarAluno(id)
-    await alunoRepository.delete(id)
+  delete: async (id: string) => {
+    const aluno = await alunoRepository.findById(id);
+    if (!aluno) throw new AppError('Aluno não encontrado', 404);
+    await alunoRepository.delete(id);
   },
-}
+};

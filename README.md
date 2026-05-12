@@ -18,25 +18,28 @@
 
 ## 🚧 Status do Projeto
 
-[![Versão](https://img.shields.io/badge/Versão-Release%201-blue?style=for-the-badge)](https://github.com/) ![Stack](https://img.shields.io/badge/Stack-Node.js%20%7C%20React%20%7C%20PostgreSQL-339933?style=for-the-badge) ![GitHub license](https://img.shields.io/github/license/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software?style=for-the-badge&color=007ec6&logo=opensourceinitiative)
+[![Versão](https://img.shields.io/badge/Versão-Lab03S02-blue?style=for-the-badge)](https://github.com/)
+![Sprint](https://img.shields.io/badge/Sprint-Lab03S02-6d28d9?style=for-the-badge)
+![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express%20%2B%20Prisma-339933?style=for-the-badge)
+![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite%20%2B%20Tailwind-61DAFB?style=for-the-badge)
+![DB](https://img.shields.io/badge/Banco-PostgreSQL-4169E1?style=for-the-badge)
+![GitHub license](https://img.shields.io/github/license/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software?style=for-the-badge&color=007ec6&logo=opensourceinitiative)
 
 ---
 
 ## 📚 Índice
+
 - [Sobre o Projeto](#-sobre-o-projeto)
-- [Funcionalidades Principais](#-funcionalidades-principais)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
-- [Incrementos de Desenvolvimento](#-incrementos-de-desenvolvimento)
+- [Arquitetura](#-arquitetura)
+- [Modelo de Dados](#-modelo-de-dados)
 - [Instalação e Execução](#-instalação-e-execução)
-  - [Pré-requisitos](#pré-requisitos)
-  - [Instalação de Dependências e Como Executar a Aplicação](#-instalação-de-dependências-e-como-executar-a-aplicação)
+- [Rotas da API](#-rotas-da-api)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
+- [Status Lab03S02](#-status-lab03s02)
 - [User Stories](#-user-stories)
 - [Diagramas](#-diagramas)
-- [Documentações Utilizadas](#-documentações-utilizadas)
 - [Autores](#-autores)
-- [Contribuição](#-contribuição)
-- [Agradecimentos](#-agradecimentos)
 - [Licença](#-licença)
 
 ---
@@ -45,89 +48,66 @@
 
 O **Sistema de Moeda Estudantil** é uma aplicação web Full-Stack projetada para fomentar o mérito acadêmico por meio de uma moeda virtual gerenciada dentro do ambiente institucional.
 
-- **Por que ele existe:**
-  Surgiu da necessidade de criar um canal formal e rastreável para que professores reconheçam bons comportamentos e desempenhos de alunos, substituindo elogios informais por um sistema de recompensas concreto e mensurável.
-
-- **Qual problema ele resolve:**
-  O sistema centraliza a distribuição e o resgate de moedas estudantis, garantindo:
-  - **Reconhecimento de Mérito:** Professores enviam moedas com mensagem de reconhecimento obrigatória.
-  - **Transparência Financeira:** Extrato de conta para alunos e professores, com histórico completo de transações.
-  - **Ecossistema de Vantagens:** Empresas parceiras cadastram benefícios que os alunos podem resgatar com suas moedas.
-  - **Notificações Automáticas:** E-mails enviados ao aluno ao receber moedas e ao resgatar vantagens, com geração de cupom com código único.
-
-- **Qual o contexto:**
-  Desenvolvido em ambiente acadêmico na disciplina de Laboratório de Desenvolvimento de Software da PUC Minas. O projeto aplica boas práticas de Engenharia de Software com arquitetura **MVC**, desenvolvimento **Full-Stack** e modelagem **UML** completa.
-
-- **Onde ele pode ser utilizado:**
-  - **Instituições de Ensino:** Como plataforma de incentivo ao mérito estudantil, integrando professores, alunos e parceiros.
-  - **Empresas Parceiras:** Como canal para oferecer descontos e benefícios ao público estudantil.
-  - **Portfólio Acadêmico:** Como case de estudo prático de desenvolvimento Full-Stack com integração entre sistemas.
-
----
-
-## ✨ Funcionalidades Principais
-
-- 👤 **Gestão de Alunos (CRUD):** Cadastro com nome, e-mail, CPF, RG, endereço, instituição e curso. Área de perfil para consulta e atualização de dados.
-- 🏫 **Gestão de Professores:** Professores pré-cadastrados pelas instituições recebem 1.000 moedas por semestre (saldo acumulável).
-- 🏢 **Gestão de Empresas Parceiras (CRUD):** Empresas se cadastram e oferecem vantagens com descrição, foto e custo em moedas.
-- 💰 **Distribuição de Moedas:** Professor envia moedas a um aluno com motivo obrigatório, validando saldo antes da transação.
-- 🎁 **Resgate de Vantagens:** Aluno seleciona uma vantagem, tem o saldo descontado e recebe cupom por e-mail com código único.
-- 📋 **Extrato de Conta:** Alunos e professores consultam histórico completo de transações (envios, recebimentos e resgates).
-- 📧 **Notificações por E-mail:** Envio automático ao aluno ao receber moedas e ao resgatar vantagem; envio ao parceiro com código de validação.
-- 🔒 **Autenticação:** Login com e-mail e senha para alunos, professores e empresas parceiras.
+- **Por que ele existe:** Surgiu da necessidade de criar um canal formal e rastreável para que professores reconheçam bons comportamentos e desempenhos de alunos.
+- **Qual problema ele resolve:** Centraliza a distribuição e o resgate de moedas estudantis, garantindo reconhecimento de mérito, transparência financeira e ecossistema de vantagens.
+- **Contexto:** Disciplina de Laboratório de Desenvolvimento de Software — PUC Minas.
 
 ---
 
 ## 🛠 Tecnologias Utilizadas
 
-A stack foi escolhida com foco em produtividade, TypeScript unificado em toda a aplicação e alinhamento com a arquitetura **MVC** exigida pelo laboratório.
-
-| Camada | Tecnologia | Justificativa |
-| --- | --- | --- |
-| **Runtime back-end** | [Node.js 20](https://nodejs.org/) | Runtime leve, não-blocante, amplamente adotado no mercado |
-| **Framework back-end** | [Express](https://expressjs.com/) + [TypeScript](https://www.typescriptlang.org/) | Framework MVC minimalista; TypeScript unifico com o front-end |
-| **ORM / Persistência** | [Prisma](https://www.prisma.io/) | ORM moderno com schema tipado, migrations automáticas e excelente DX |
-| **Banco de Dados** | [PostgreSQL](https://www.postgresql.org/) | Banco relacional robusto para transações de moedas e joins complexos |
-| **Validação** | [Zod](https://zod.dev/) | Schema de validação compartilhável entre back-end e front-end |
-| **Front-end** | [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) + [Vite](https://vitejs.dev/) | SPA moderna, tipagem estática, build rápido |
-| **Estilização** | [Tailwind CSS](https://tailwindcss.com/) | Utilitário CSS — produtividade alta sem CSS manual |
-| **Componentes UI** | [shadcn/ui](https://ui.shadcn.com/) | Componentes acessíveis, personalizáveis, baseados em Radix UI |
-| **Formulários** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) | Formulários performáticos com validação integrada |
-| **HTTP client** | [Axios](https://axios-http.com/) | Cliente HTTP com interceptors, tratamento de erros centralizado |
-| **Ícones** | [Lucide React](https://lucide.dev/) | Biblioteca de ícones SVG moderna e tree-shakeable |
-| **Autenticação** | JWT ([jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)) | Autenticação stateless para API REST — implementada na Sprint 03 |
-| **E-mail** | [Nodemailer](https://nodemailer.com/) | Envio de notificações e cupons — implementado na Sprint 03 |
-| **Containerização** | [Docker](https://www.docker.com/) + [Docker Compose](https://docs.docker.com/compose/) | Sobe PostgreSQL localmente sem instalação manual |
-| **Controle de Versão** | [Git](https://git-scm.com/) + [GitHub](https://github.com/) | Versionamento e colaboração da equipe |
+| Camada         | Tecnologias                                                            |
+| -------------- | ---------------------------------------------------------------------- |
+| Front-end      | React 18, Vite, TypeScript, Tailwind CSS, Lucide React, React Router v6 |
+| Formulários    | React Hook Form, Zod                                                   |
+| HTTP Client    | Axios                                                                  |
+| Back-end       | Node.js 20, Express, TypeScript                                        |
+| ORM            | Prisma 5                                                               |
+| Banco de dados | PostgreSQL 16                                                          |
+| Infraestrutura | Docker, Docker Compose                                                 |
+| Validação      | Zod (back + front)                                                     |
 
 ---
 
-## 📈 Incrementos de Desenvolvimento
+## 🏗 Arquitetura
 
-Cada incremento representa uma entrega funcional ou artefato de projeto vinculado a uma sprint. O desenvolvimento segue as entregas definidas no roteiro do laboratório (**Lab03S01**, **Lab03S02** e **Lab03S03**).
+```
+Frontend (React/Vite :5173)
+    └── Axios → /api/* (proxy Vite)
+         └── Backend (Express :3333)
+              └── Controller → Service → Repository → Prisma → PostgreSQL
+```
 
-| # | Incremento | Sprint | Status |
-|---|-----------|--------|--------|
-| 1 | Diagrama de Casos de Uso | Sprint 01 | ✅ Concluído |
-| 2 | Histórias do Usuário (User Stories) | Sprint 01 | ✅ Concluído |
-| 3 | Diagrama de Classes | Sprint 01 | ✅ Concluído |
-| 4 | Diagrama de Componentes | Sprint 01 | ✅ Concluído |
-| 5 | Modelo ER (Entidade-Relacionamento) | Sprint 02 | ⏳ Pendente |
-| 6 | Configuração do banco de dados (PostgreSQL + Docker) | Sprint 02 | ✅ Concluído |
-| 7 | Camada de persistência com Prisma ORM (schema + migrations) | Sprint 02 | ✅ Concluído |
-| 8 | CRUD de Aluno — back-end (API REST) | Sprint 02 | ✅ Concluído |
-| 9 | CRUD de Empresa Parceira — back-end (API REST) | Sprint 02 | ✅ Concluído |
-| 10 | CRUD de Aluno — front-end (React + integração com API) | Sprint 02 | ⏳ Pendente |
-| 11 | CRUD de Empresa Parceira — front-end (React + integração com API) | Sprint 02 | ⏳ Pendente |
-| 12 | CRUD de Aluno e Empresa Parceira — versão final (refinamentos) | Sprint 03 | ⏳ Pendente |
-| 13 | Autenticação e autorização (Spring Security + JWT) | Sprint 03 | ⏳ Pendente |
-| 14 | Módulo de Professor: distribuição de moedas com validação de saldo | Sprint 03 | ⏳ Pendente |
-| 15 | Módulo de Aluno: resgate de vantagens + geração de cupom com código único | Sprint 03 | ⏳ Pendente |
-| 16 | Notificações por e-mail (recebimento de moedas e resgate de vantagem) | Sprint 03 | ⏳ Pendente |
-| 17 | Extrato de conta (professores e alunos) | Sprint 03 | ⏳ Pendente |
-| 18 | Diagrama de Arquitetura + slides para apresentação final | Sprint 03 | ⏳ Pendente |
+### Camadas do backend
 
-> **Legenda:** ✅ Concluído &nbsp;|&nbsp; 🔄 Em andamento &nbsp;|&nbsp; ⏳ Pendente
+| Camada     | Responsabilidade                                    |
+|------------|-----------------------------------------------------|
+| Controller | Recebe request, chama service, retorna response     |
+| Service    | Valida regras de negócio (unicidade, existência)    |
+| Repository | Acessa banco via Prisma, sem regra de negócio       |
+| Prisma     | ORM — mapeia entidades, gera SQL, gerencia migrations|
+
+---
+
+## 🗄 Modelo de Dados
+
+### Entidades implementadas na Sprint Lab03S02
+
+```
+Usuario         → id, nome, email, senhaHash, tipo, createdAt, updatedAt
+Instituicao     → id, nome, createdAt, updatedAt
+Aluno           → id, nome, email, cpf, rg, endereco, curso, saldoMoedas(=0), instituicaoId, usuarioId?
+EmpresaParceira → id, nome, email, cnpj, endereco, telefone?, status(ATIVA/INATIVA), usuarioId?
+```
+
+### Entidades no schema (implementação futura)
+
+```
+Professor       → id, nome, cpf, departamento, saldoMoedas(=1000), instituicaoId, usuarioId?
+Vantagem        → id, titulo, descricao, fotoUrl?, custoMoedas, empresaParceiraId
+TransacaoMoeda  → id, tipo, valor, motivo, alunoId, professorId?, vantagemId?
+Resgate         → id, codigoCupom, status, alunoId, vantagemId
+```
 
 ---
 
@@ -135,145 +115,190 @@ Cada incremento representa uma entrega funcional ou artefato de projeto vinculad
 
 ### Pré-requisitos
 
-- [Node.js 20+](https://nodejs.org/) e [npm](https://www.npmjs.com/) — runtime do back-end e do front-end
-- [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/) — para subir o PostgreSQL localmente
-- IDE de sua preferência (recomendado: [VS Code](https://code.visualstudio.com/) ou [Cursor](https://www.cursor.com/))
-- Navegador atualizado
+- [Node.js 20+](https://nodejs.org/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Git](https://git-scm.com/)
 
-### 📦 Instalação de Dependências e Como Executar a Aplicação
+### 1. Clone o repositório
 
-> ⚠️ Esta seção será detalhada a partir da Sprint 02, quando o código será implementado.
+```bash
+git clone https://github.com/seu-usuario/SistemaMoedaEstudantil.git
+cd SistemaMoedaEstudantil
+```
 
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/SistemaMoedaEstudantil.git
-   ```
-2. Suba o banco de dados com Docker:
-   ```bash
-   docker-compose up -d
-   ```
-3. Configure as variáveis de ambiente do back-end:
-   ```bash
-   cd backend
-   cp .env.example .env
-   # edite o .env com a URL do banco e demais configs
-   ```
-4. Instale as dependências e rode as migrations:
-   ```bash
-   npm install
-   npx prisma migrate dev
-   npx prisma db seed   # opcional: dados iniciais (instituições)
-   ```
-5. Execute o back-end:
-   ```bash
-   npm run dev
-   # servidor disponível em http://localhost:3333
-   ```
-6. Em outro terminal, execute o front-end:
-   ```bash
-   cd ../frontend
-   npm install
-   npm run dev
-   # aplicação disponível em http://localhost:5173
-   ```
+### 2. Configure o banco de dados (Docker)
+
+```bash
+docker-compose up -d
+```
+
+Isso sobe um container PostgreSQL na porta `5432` com:
+- **Usuário:** `postgres`
+- **Senha:** `postgres`
+- **Banco:** `moeda_estudantil`
+
+### 3. Configure e inicie o back-end
+
+```bash
+cd backend
+npm install
+# Copie o arquivo de variáveis de ambiente:
+copy .env.example .env
+# Rode a migration e crie as tabelas:
+npx prisma migrate dev
+# Popule com dados iniciais (5 instituições):
+npx prisma db seed
+# Inicie o servidor:
+npm run dev
+```
+
+O backend estará em: **http://localhost:3333**
+
+### 4. Inicie o front-end
+
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
+
+O frontend estará em: **http://localhost:5173**
+
+### 5. Acesse o sistema
+
+Abra **http://localhost:5173** e entre com qualquer e-mail e senha.
+
+> **Nota:** A autenticação real (JWT) será implementada na Sprint Lab03S03.
+
+---
+
+## 🔌 Rotas da API
+
+Base URL: `http://localhost:3333/api`
+
+### Health Check
+| Método | Rota          | Descrição          |
+|--------|---------------|--------------------|
+| GET    | `/health`     | Verifica se a API está rodando |
+
+### Alunos — `GET/POST/PUT/DELETE /alunos`
+| Método | Rota           | Descrição                    |
+|--------|----------------|------------------------------|
+| GET    | `/alunos`      | Lista todos (query: `search`) |
+| GET    | `/alunos/:id`  | Busca por ID                 |
+| POST   | `/alunos`      | Cria novo aluno              |
+| PUT    | `/alunos/:id`  | Atualiza aluno               |
+| DELETE | `/alunos/:id`  | Remove aluno                 |
+
+### Empresas Parceiras — `GET/POST/PUT/DELETE /empresas-parceiras`
+| Método | Rota                        | Descrição             |
+|--------|-----------------------------|-----------------------|
+| GET    | `/empresas-parceiras`       | Lista todas           |
+| GET    | `/empresas-parceiras/:id`   | Busca por ID          |
+| POST   | `/empresas-parceiras`       | Cria nova empresa     |
+| PUT    | `/empresas-parceiras/:id`   | Atualiza empresa      |
+| DELETE | `/empresas-parceiras/:id`   | Remove empresa        |
+
+### Instituições — `GET/POST/PUT/DELETE /instituicoes`
+| Método | Rota               | Descrição             |
+|--------|--------------------|-----------------------|
+| GET    | `/instituicoes`    | Lista todas           |
+| GET    | `/instituicoes/:id`| Busca por ID          |
+| POST   | `/instituicoes`    | Cria nova instituição |
+| PUT    | `/instituicoes/:id`| Atualiza instituição  |
+| DELETE | `/instituicoes/:id`| Remove instituição    |
+
+### Dashboard
+| Método | Rota         | Descrição                                  |
+|--------|--------------|--------------------------------------------|
+| GET    | `/dashboard` | Totais + últimos 5 alunos e 5 empresas     |
 
 ---
 
 ## 📂 Estrutura de Pastas
 
-> ⚠️ A estrutura será detalhada conforme o desenvolvimento avança nas sprints.
-
 ```
 SistemaMoedaEstudantil/
-├── backend/                            # Node.js + Express + TypeScript
+├── backend/
 │   ├── prisma/
-│   │   ├── schema.prisma               # Definição do modelo de dados
-│   │   └── seed.ts                     # Dados iniciais (instituições, etc.)
+│   │   ├── schema.prisma          ← Modelo de dados completo
+│   │   ├── seed.ts                ← Dados iniciais
+│   │   └── migrations/            ← Histórico de migrations
 │   ├── src/
-│   │   ├── controllers/                # Camada MVC — recebem requisições HTTP
-│   │   │   ├── alunoController.ts
-│   │   │   ├── empresaParceiraController.ts
-│   │   │   └── instituicaoController.ts
-│   │   ├── services/                   # Regras de negócio
-│   │   │   ├── alunoService.ts
-│   │   │   ├── empresaParceiraService.ts
-│   │   │   └── instituicaoService.ts
-│   │   ├── repositories/               # Acesso ao banco via Prisma
-│   │   │   ├── alunoRepository.ts
-│   │   │   ├── empresaParceiraRepository.ts
-│   │   │   └── instituicaoRepository.ts
-│   │   ├── routes/                     # Definição das rotas REST
-│   │   ├── middlewares/                # Tratamento de erros, auth, etc.
-│   │   ├── validators/                 # Schemas Zod de validação
-│   │   ├── lib/
-│   │   │   └── prisma.ts               # Singleton do PrismaClient
-│   │   └── server.ts                   # Entry point do servidor
+│   │   ├── controllers/           ← Recebe requisições HTTP
+│   │   ├── services/              ← Regras de negócio
+│   │   ├── repositories/          ← Acesso ao banco (Prisma)
+│   │   ├── routes/                ← Definição de rotas Express
+│   │   ├── validators/            ← Schemas Zod
+│   │   ├── middlewares/           ← Error handler
+│   │   ├── lib/prisma.ts          ← Singleton PrismaClient
+│   │   └── server.ts              ← Entry point
 │   ├── .env.example
 │   ├── package.json
 │   └── tsconfig.json
 │
-├── frontend/                           # React 18 + TypeScript + Vite
+├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── layout/                 # Layout, Sidebar, Header
-│   │   │   └── ui/                     # Componentes shadcn/ui e customizados
+│   │   │   ├── layout/            ← Layout, Sidebar, Header
+│   │   │   └── ui/                ← Button, Input, Modal, Badge...
 │   │   ├── pages/
 │   │   │   ├── Login.tsx
 │   │   │   ├── Dashboard.tsx
-│   │   │   ├── alunos/                 # AlunosList + AlunoForm
-│   │   │   └── empresas/              # EmpresasList + EmpresaForm
-│   │   ├── services/                   # Chamadas HTTP via Axios
-│   │   ├── types/                      # Tipagens TypeScript compartilhadas
-│   │   └── App.tsx
-│   ├── package.json
-│   └── vite.config.ts
+│   │   │   ├── alunos/            ← AlunosList, AlunoForm
+│   │   │   ├── empresas/          ← EmpresasList, EmpresaForm
+│   │   │   └── instituicoes/      ← InstituicoesList
+│   │   ├── services/              ← Axios + chamadas à API
+│   │   ├── types/index.ts         ← Tipos TypeScript
+│   │   ├── App.tsx                ← Rotas React Router
+│   │   └── main.tsx
+│   ├── tailwind.config.ts
+│   ├── vite.config.ts
+│   └── package.json
 │
-├── docs/                               # Artefatos UML e diagramas
-│   └── diagramas/
-│       ├── casos-de-uso/
-│       ├── diagrama-de-classes/
-│       ├── componentes/
-│       ├── modelo-er/
-│       └── arquitetura/
-├── docker-compose.yml                  # PostgreSQL local
-├── README.md
-└── LICENSE
+├── docs/
+│   └── diagramas/                 ← Casos de uso, Classes, ER
+├── docker-compose.yml             ← PostgreSQL 16
+├── .gitignore
+└── README.md
 ```
-
-> ⚠️ A estrutura de código será criada a partir da Sprint 02.
 
 ---
 
-## 🗄️ Modelo de Dados
+## ✅ Status Lab03S02
 
-As entidades abaixo compõem o schema Prisma. O CRUD completo das entidades marcadas com ⭐ é entregue na Sprint 02; as demais ficam no schema para uso na Sprint 03.
+| Item                                          | Status |
+|-----------------------------------------------|--------|
+| Modelo ER criado (schema.prisma)              | ✅     |
+| Migration aplicada                            | ✅     |
+| Estratégia de persistência: Prisma + Repos    | ✅     |
+| CRUD Aluno (Controller/Service/Repository)    | ✅     |
+| CRUD Empresa Parceira                         | ✅     |
+| CRUD Instituição                              | ✅     |
+| Validações Zod (back + front)                 | ✅     |
+| Regras de negócio (email único, CPF único)    | ✅     |
+| Rotas REST padronizadas `/api/*`              | ✅     |
+| Front-end React + Vite + Tailwind             | ✅     |
+| Tela de Login                                 | ✅     |
+| Dashboard com cards e últimos cadastros       | ✅     |
+| Tela de Alunos (listagem + busca + CRUD)      | ✅     |
+| Tela de Empresas Parceiras (listagem + CRUD)  | ✅     |
+| Tela de Instituições                          | ✅     |
+| Integração real front ↔ back via Axios        | ✅     |
+| Seed com 5 instituições                       | ✅     |
+| Docker Compose para PostgreSQL                | ✅     |
 
-| Entidade | Sprint | Descrição |
-|----------|--------|-----------|
-| `Instituicao` ⭐ | Sprint 02 | Instituições de ensino pré-cadastradas; alunos e professores se vinculam a elas |
-| `Aluno` ⭐ | Sprint 02 | Dados do aluno: nome, CPF, RG, e-mail, endereço, curso, saldo de moedas |
-| `EmpresaParceira` ⭐ | Sprint 02 | Empresas que oferecem vantagens; cadastro com CNPJ, e-mail e status |
-| `Usuario` | Sprint 03 | Entidade de autenticação (e-mail + senha hash + tipo: ALUNO/PROFESSOR/EMPRESA) |
-| `Professor` | Sprint 03 | Docente pré-cadastrado; recebe 1.000 moedas/semestre (saldo acumulável) |
-| `Vantagem` | Sprint 03 | Produto ou desconto oferecido por empresa parceira (título, descrição, foto, custo) |
-| `TransacaoMoeda` | Sprint 03 | Histórico de envios e resgates de moedas (tipo: ENVIO / RECEBIMENTO / RESGATE) |
-| `Resgate` | Sprint 03 | Registro de resgate de vantagem com código de cupom único gerado pelo sistema |
+### Para Sprint Lab03S03 (próximos passos)
 
-### Relacionamentos principais
-
-```
-Instituicao ──< Aluno
-Instituicao ──< Professor
-Usuario ──── Aluno          (1:1)
-Usuario ──── Professor      (1:1)
-Usuario ──── EmpresaParceira (1:1)
-EmpresaParceira ──< Vantagem
-Aluno ──< TransacaoMoeda
-Professor ──< TransacaoMoeda
-Vantagem ──< TransacaoMoeda
-Aluno ──< Resgate
-Vantagem ──< Resgate
-```
+| Item                                        |
+|---------------------------------------------|
+| Autenticação JWT (login real)               |
+| CRUD de Professores                         |
+| Distribuição de moedas                      |
+| Extrato de transações                       |
+| Cadastro de vantagens por empresa           |
+| Resgate de vantagens + cupons               |
+| Notificações por e-mail                     |
 
 ---
 
@@ -281,47 +306,33 @@ Vantagem ──< Resgate
 
 ### Aluno
 
-| ID   | História do Usuário                                                                              | Critérios de Aceitação                                                          |
-| ---- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| HU01 | Como aluno, quero me cadastrar no sistema para participar do programa de moeda estudantil.       | Deve informar nome, e-mail, CPF, RG, endereço, instituição e curso.             |
-| HU02 | Como aluno, quero fazer login para acessar minhas funcionalidades com segurança.                 | O sistema deve validar e-mail e senha antes de liberar acesso.                  |
-| HU03 | Como aluno, quero consultar meu saldo para saber quantas moedas possuo.                          | O sistema deve exibir o saldo atualizado.                                       |
-| HU04 | Como aluno, quero consultar meu extrato para acompanhar moedas recebidas e vantagens resgatadas. | O extrato deve listar data, tipo da transação, valor e descrição.               |
-| HU05 | Como aluno, quero visualizar vantagens disponíveis para escolher onde gastar minhas moedas.      | O sistema deve listar vantagens com descrição, foto, empresa e custo em moedas. |
-| HU06 | Como aluno, quero resgatar uma vantagem para trocar minhas moedas por benefícios.                | O sistema deve validar saldo, descontar moedas e gerar um código de cupom.      |
-| HU07 | Como aluno, quero receber um e-mail com o cupom para apresentar na troca presencial.             | O e-mail deve conter o código gerado pelo sistema e dados da vantagem.          |
-
-### Professor
-
-| ID   | História do Usuário                                                                                   | Critérios de Aceitação                                                      |
-| ---- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| HU08 | Como professor, quero fazer login para acessar minha conta no sistema.                                | O sistema deve autenticar professor pré-cadastrado.                         |
-| HU09 | Como professor, quero receber 1.000 moedas por semestre para distribuir aos alunos.                   | O saldo semestral deve ser acumulado ao saldo existente.                    |
-| HU10 | Como professor, quero enviar moedas a um aluno para reconhecer seu mérito.                            | Deve selecionar aluno, informar quantidade e motivo obrigatório.            |
-| HU11 | Como professor, quero que o sistema valide meu saldo antes do envio para evitar transações inválidas. | A transação só deve ocorrer se houver saldo suficiente.                     |
-| HU12 | Como professor, quero consultar meu extrato para ver as moedas que distribuí.                         | O extrato deve mostrar envios realizados, alunos, valores, datas e motivos. |
+| ID   | História do Usuário                                                                              | Status Lab03S02 |
+| ---- | ------------------------------------------------------------------------------------------------ | --------------- |
+| HU01 | Como aluno, quero me cadastrar no sistema para participar do programa de moeda estudantil.       | ✅ Implementado |
+| HU02 | Como aluno, quero fazer login para acessar minhas funcionalidades com segurança.                 | 🔄 Login visual (auth real Sprint 03) |
+| HU03 | Como aluno, quero consultar meu saldo para saber quantas moedas possuo.                          | 🔄 Sprint 03 |
+| HU04 | Como aluno, quero consultar meu extrato para acompanhar moedas recebidas e vantagens resgatadas. | 🔄 Sprint 03 |
+| HU05 | Como aluno, quero visualizar vantagens disponíveis para escolher onde gastar minhas moedas.      | 🔄 Sprint 03 |
+| HU06 | Como aluno, quero resgatar uma vantagem para trocar minhas moedas por benefícios.                | 🔄 Sprint 03 |
+| HU07 | Como aluno, quero receber um e-mail com o cupom para apresentar na troca presencial.             | 🔄 Sprint 03 |
 
 ### Empresa Parceira
 
-| ID   | História do Usuário                                                                                     | Critérios de Aceitação                                                |
-| ---- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| HU13 | Como empresa parceira, quero me cadastrar no sistema para oferecer vantagens aos alunos.                | Deve informar dados da empresa, login e senha.                        |
-| HU14 | Como empresa parceira, quero cadastrar vantagens para que alunos possam resgatá-las.                    | Deve informar título, descrição, foto e custo em moedas.              |
-| HU15 | Como empresa parceira, quero receber um e-mail quando uma vantagem for resgatada para conferir a troca. | O e-mail deve conter código de validação, aluno e vantagem resgatada. |
+| ID   | História do Usuário                                                                                     | Status Lab03S02 |
+| ---- | ------------------------------------------------------------------------------------------------------- | --------------- |
+| HU13 | Como empresa parceira, quero me cadastrar no sistema para oferecer vantagens aos alunos.                | ✅ Implementado |
+| HU14 | Como empresa parceira, quero cadastrar vantagens para que alunos possam resgatá-las.                    | 🔄 Sprint 03 |
+| HU15 | Como empresa parceira, quero receber um e-mail quando uma vantagem for resgatada para conferir a troca. | 🔄 Sprint 03 |
 
-### Administrador / Sistema
+### Administrador
 
-| ID   | História do Usuário                                                                                                              | Critérios de Aceitação                                             |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| HU16 | Como administrador, quero manter instituições pré-cadastradas para que alunos e professores sejam vinculados corretamente.       | O aluno deve selecionar uma instituição existente.                 |
-| HU17 | Como administrador, quero manter professores pré-cadastrados para representar os docentes enviados pelas instituições parceiras. | Cada professor deve possuir nome, CPF, departamento e instituição. |
-| HU18 | Como sistema, quero enviar notificações por e-mail para alunos e empresas em eventos importantes.                                | O envio deve ocorrer ao receber moedas e ao resgatar vantagens.    |
+| ID   | História do Usuário                                                                                                              | Status Lab03S02 |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| HU16 | Como administrador, quero manter instituições pré-cadastradas para que alunos e professores sejam vinculados corretamente.       | ✅ Implementado |
 
 ---
 
 ## 🎥 Diagramas
-
-As imagens abaixo vêm dos arquivos em `docs/diagramas/` (casos de uso e diagrama de classes).
 
 ### Diagrama de Casos de Uso
 
@@ -331,35 +342,24 @@ As imagens abaixo vêm dos arquivos em `docs/diagramas/` (casos de uso e diagram
 
 <img width="700" alt="Diagrama de classes do Sistema de Moeda Estudantil" src="docs/diagramas/diagrama-de-classes/Diagrama%20de%20Classe-%20Lab%20projeto.jpeg"/>
 
-
-### Diagrama de Componentes
-> Em elaboração — Sprint 01.
-
 ### Modelo ER
-> Em elaboração — Sprint 02.
+> Implementado como `backend/prisma/schema.prisma` — Sprint Lab03S02.
 
 ### Diagrama de Arquitetura
-> Em elaboração — Sprint 03.
+> Em elaboração — Sprint Lab03S03.
 
 ---
 
 ## 🔗 Documentações Utilizadas
 
 - [**Laboratório de Desenvolvimento de Software — PUC Minas**](https://github.com/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software)
-- [**Template README — Prof. João Paulo Aramuni**](https://github.com/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software/blob/main/TEMPLATES/template_README.md)
+- [**Prisma ORM**](https://www.prisma.io/docs)
+- [**Express.js**](https://expressjs.com/)
+- [**React**](https://react.dev/)
+- [**Tailwind CSS**](https://tailwindcss.com/)
+- [**Vite**](https://vitejs.dev/)
+- [**Zod**](https://zod.dev/)
 - [**Conventional Commits**](https://www.conventionalcommits.org/en/v1.0.0/)
-- [**Node.js — Documentação Oficial**](https://nodejs.org/en/docs)
-- [**Express — Documentação Oficial**](https://expressjs.com/)
-- [**Prisma — Documentação Oficial**](https://www.prisma.io/docs)
-- [**Zod — Documentação Oficial**](https://zod.dev/)
-- [**React — Documentação Oficial**](https://react.dev/)
-- [**Vite — Documentação Oficial**](https://vitejs.dev/guide/)
-- [**Tailwind CSS — Documentação Oficial**](https://tailwindcss.com/docs)
-- [**shadcn/ui — Documentação Oficial**](https://ui.shadcn.com/docs)
-- [**React Hook Form — Documentação Oficial**](https://react-hook-form.com/get-started)
-- [**Axios — Documentação Oficial**](https://axios-http.com/docs/intro)
-- [**PostgreSQL — Documentação Oficial**](https://www.postgresql.org/docs/)
-- [**Docker Compose — Documentação Oficial**](https://docs.docker.com/compose/)
 
 ---
 
@@ -375,7 +375,7 @@ As imagens abaixo vêm dos arquivos em `docs/diagramas/` (casos de uso e diagram
 
 1. Faça um `fork` do projeto.
 2. Crie uma branch para sua feature (`git checkout -b feature/minha-feature`).
-3. Commit suas mudanças (`git commit -m 'feat: Adiciona nova funcionalidade X'`). **(Utilize [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/))**
+3. Commit suas mudanças (`git commit -m 'feat: Adiciona nova funcionalidade X'`).
 4. Faça o `push` para a branch (`git push origin feature/minha-feature`).
 5. Abra um **Pull Request (PR)**.
 
@@ -383,8 +383,8 @@ As imagens abaixo vêm dos arquivos em `docs/diagramas/` (casos de uso e diagram
 
 ## 🙏 Agradecimentos
 
-- [**Engenharia de Software PUC Minas**](https://www.instagram.com/engsoftwarepucminas/) — Pelo apoio institucional e fomento à inovação e boas práticas de engenharia.
-- [**Prof. Dr. João Paulo Aramuni**](https://github.com/joaopauloaramuni) — Pelos ensinamentos sobre **Arquitetura de Software** e **Padrões de Projeto**.
+- [**Engenharia de Software PUC Minas**](https://www.instagram.com/engsoftwarepucminas/) — Pelo apoio institucional.
+- [**Prof. Dr. João Paulo Aramuni**](https://github.com/joaopauloaramuni) — Pelos ensinamentos sobre Arquitetura de Software e Padrões de Projeto.
 
 ---
 

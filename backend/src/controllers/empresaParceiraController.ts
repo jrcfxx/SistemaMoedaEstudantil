@@ -1,60 +1,50 @@
-import { NextFunction, Request, Response } from 'express'
-import { empresaParceiraService } from '../services/empresaParceiraService'
-import {
-  createEmpresaParceiraSchema,
-  updateEmpresaParceiraSchema,
-} from '../validators/empresaParceiraValidator'
+import { Request, Response, NextFunction } from 'express';
+import { empresaParceiraService } from '../services/empresaParceiraService';
 
 export const empresaParceiraController = {
-  // GET /api/empresas
-  async index(req: Request, res: Response, next: NextFunction) {
+  findAll: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const empresas = await empresaParceiraService.listarEmpresas()
-      res.json({ data: empresas, total: empresas.length })
-    } catch (err) {
-      next(err)
+      const search = req.query.search as string | undefined;
+      const empresas = await empresaParceiraService.findAll(search);
+      res.json(empresas);
+    } catch (error) {
+      next(error);
     }
   },
 
-  // GET /api/empresas/:id
-  async show(req: Request, res: Response, next: NextFunction) {
+  findById: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const empresa = await empresaParceiraService.buscarEmpresa(req.params.id)
-      res.json({ data: empresa })
-    } catch (err) {
-      next(err)
+      const empresa = await empresaParceiraService.findById(req.params.id);
+      res.json(empresa);
+    } catch (error) {
+      next(error);
     }
   },
 
-  // POST /api/empresas
-  async store(req: Request, res: Response, next: NextFunction) {
+  create: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const input = createEmpresaParceiraSchema.parse(req.body)
-      const empresa = await empresaParceiraService.criarEmpresa(input)
-      res.status(201).json({ data: empresa })
-    } catch (err) {
-      next(err)
+      const empresa = await empresaParceiraService.create(req.body);
+      res.status(201).json(empresa);
+    } catch (error) {
+      next(error);
     }
   },
 
-  // PUT /api/empresas/:id
-  async update(req: Request, res: Response, next: NextFunction) {
+  update: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const input = updateEmpresaParceiraSchema.parse(req.body)
-      const empresa = await empresaParceiraService.atualizarEmpresa(req.params.id, input)
-      res.json({ data: empresa })
-    } catch (err) {
-      next(err)
+      const empresa = await empresaParceiraService.update(req.params.id, req.body);
+      res.json(empresa);
+    } catch (error) {
+      next(error);
     }
   },
 
-  // DELETE /api/empresas/:id
-  async destroy(req: Request, res: Response, next: NextFunction) {
+  delete: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await empresaParceiraService.removerEmpresa(req.params.id)
-      res.status(204).send()
-    } catch (err) {
-      next(err)
+      await empresaParceiraService.delete(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      next(error);
     }
   },
-}
+};

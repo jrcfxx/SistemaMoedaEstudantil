@@ -1,12 +1,10 @@
-import { Router } from 'express'
-import { alunoController } from '../controllers/alunoController'
+import { Router } from 'express';
+import { alunoController } from '../controllers/alunoController';
 
-const router = Router()
+export const alunoRoutes = Router();
 
-router.get('/', alunoController.index)
-router.get('/:id', alunoController.show)
-router.post('/', alunoController.store)
-router.put('/:id', alunoController.update)
-router.delete('/:id', alunoController.destroy)
-
-export default router
+alunoRoutes.get('/', alunoController.findAll);
+alunoRoutes.get('/:id', alunoController.findById);
+alunoRoutes.post('/', alunoController.create);
+alunoRoutes.put('/:id', alunoController.update);
+alunoRoutes.delete('/:id', alunoController.delete);

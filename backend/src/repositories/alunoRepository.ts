@@ -1,61 +1,67 @@
-import { prisma } from '../lib/prisma'
-import { CreateAlunoInput, UpdateAlunoInput } from '../validators/alunoValidator'
-
-const alunoSelect = {
-  id: true,
-  nome: true,
-  email: true,
-  cpf: true,
-  rg: true,
-  endereco: true,
-  curso: true,
-  saldoMoedas: true,
-  createdAt: true,
-  updatedAt: true,
-  instituicao: {
-    select: { id: true, nome: true },
-  },
-} as const
+import { prisma } from '../lib/prisma';
+import { CreateAlunoInput, UpdateAlunoInput } from '../validators/alunoValidator';
 
 export const alunoRepository = {
-  findAll() {
+  findAll: (search?: string) => {
     return prisma.aluno.findMany({
-      select: alunoSelect,
-      orderBy: { nome: 'asc' },
-    })
+      where: search
+        ? {
+            OR: [
+              { nome: { contains: search, mode: 'insensitive' } },
+              { email: { contains: search, mode: 'insensitive' } },
+              { cpf: { contains: search, mode: 'insensitive' } },
+              { curso: { contains: search, mode: 'insensitive' } },
+            ],
+          }
+        : undefined,
+      include: { instituicao: { select: { id: true, nome: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
   },
 
-  findById(id: string) {
+  findById: (id: string) => {
     return prisma.aluno.findUnique({
       where: { id },
-      select: alunoSelect,
-    })
+      include: { instituicao: { select: { id: true, nome: true } } },
+    });
   },
 
-  findByEmail(email: string) {
-    return prisma.aluno.findUnique({ where: { email } })
+  findByEmail: (email: string) => {
+    return prisma.aluno.findUnique({ where: { email } });
   },
 
-  findByCpf(cpf: string) {
-    return prisma.aluno.findUnique({ where: { cpf } })
+  findByCpf: (cpf: string) => {
+    return prisma.aluno.findUnique({ where: { cpf } });
   },
 
-  create(data: CreateAlunoInput) {
+  create: (data: CreateAlunoInput) => {
     return prisma.aluno.create({
-      data,
-      select: alunoSelect,
-    })
+      data: { ...data, saldoMoedas: 0 },
+      include: { instituicao: { select: { id: true, nome: true } } },
+    });
   },
 
-  update(id: string, data: UpdateAlunoInput) {
+  update: (id: string, data: UpdateAlunoInput) => {
     return prisma.aluno.update({
       where: { id },
       data,
-      select: alunoSelect,
-    })
+      include: { instituicao: { select: { id: true, nome: true } } },
+    });
   },
 
-  delete(id: string) {
-    return prisma.aluno.delete({ where: { id } })
+  delete: (id: string) => {
+    return prisma.aluno.delete({ where: { id } });
   },
-}
+
+  count: () => {
+    return prisma.aluno.count();
+  },
+
+  findRecent: (limit = 5) => {
+    return prisma.aluno.findMany({
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: { instituicao: { select: { id: true, nome: true } } },
+    });
+  },
+};

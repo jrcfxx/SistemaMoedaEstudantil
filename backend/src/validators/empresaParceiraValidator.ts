@@ -1,38 +1,17 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
-const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$|^\d{14}$/
+const cnpjRegex = /^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/;
 
 export const createEmpresaParceiraSchema = z.object({
-  nome: z
-    .string({ required_error: 'Nome é obrigatório' })
-    .min(2, 'Nome deve ter pelo menos 2 caracteres')
-    .max(120),
+  nome: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
+  email: z.string().email('E-mail inválido'),
+  cnpj: z.string().regex(cnpjRegex, 'CNPJ inválido (ex: 12345678000195 ou 12.345.678/0001-95)'),
+  endereco: z.string().min(5, 'Endereço deve ter ao menos 5 caracteres'),
+  telefone: z.string().optional(),
+  status: z.enum(['ATIVA', 'INATIVA']).optional().default('ATIVA'),
+});
 
-  email: z
-    .string({ required_error: 'E-mail é obrigatório' })
-    .email('E-mail inválido')
-    .toLowerCase(),
+export const updateEmpresaParceiraSchema = createEmpresaParceiraSchema.partial();
 
-  cnpj: z
-    .string({ required_error: 'CNPJ é obrigatório' })
-    .regex(cnpjRegex, 'CNPJ inválido. Use 00.000.000/0000-00 ou apenas os 14 dígitos'),
-
-  endereco: z
-    .string({ required_error: 'Endereço é obrigatório' })
-    .min(5, 'Endereço muito curto'),
-
-  telefone: z
-    .string()
-    .min(8, 'Telefone muito curto')
-    .max(20)
-    .optional(),
-})
-
-export const updateEmpresaParceiraSchema = createEmpresaParceiraSchema
-  .partial()
-  .extend({
-    status: z.enum(['ATIVA', 'INATIVA']).optional(),
-  })
-
-export type CreateEmpresaParceiraInput = z.infer<typeof createEmpresaParceiraSchema>
-export type UpdateEmpresaParceiraInput = z.infer<typeof updateEmpresaParceiraSchema>
+export type CreateEmpresaParceiraInput = z.infer<typeof createEmpresaParceiraSchema>;
+export type UpdateEmpresaParceiraInput = z.infer<typeof updateEmpresaParceiraSchema>;
