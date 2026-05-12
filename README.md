@@ -116,7 +116,7 @@ Cada incremento representa uma entrega funcional ou artefato de projeto vinculad
 | 6 | Configuração do banco de dados (PostgreSQL + Docker) | Sprint 02 | ✅ Concluído |
 | 7 | Camada de persistência com Prisma ORM (schema + migrations) | Sprint 02 | ✅ Concluído |
 | 8 | CRUD de Aluno — back-end (API REST) | Sprint 02 | ✅ Concluído |
-| 9 | CRUD de Empresa Parceira — back-end (API REST) | Sprint 02 | ⏳ Pendente |
+| 9 | CRUD de Empresa Parceira — back-end (API REST) | Sprint 02 | ✅ Concluído |
 | 10 | CRUD de Aluno — front-end (React + integração com API) | Sprint 02 | ⏳ Pendente |
 | 11 | CRUD de Empresa Parceira — front-end (React + integração com API) | Sprint 02 | ⏳ Pendente |
 | 12 | CRUD de Aluno e Empresa Parceira — versão final (refinamentos) | Sprint 03 | ⏳ Pendente |

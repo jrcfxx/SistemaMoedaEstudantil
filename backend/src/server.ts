@@ -3,6 +3,7 @@ import cors from 'cors'
 import express from 'express'
 import { errorHandler } from './middlewares/errorHandler'
 import alunoRoutes from './routes/alunoRoutes'
+import empresaParceiraRoutes from './routes/empresaParceiraRoutes'
 
 const app = express()
 
@@ -15,6 +16,7 @@ app.get('/api/health', (_req, res) => {
 })
 
 app.use('/api/alunos', alunoRoutes)
+app.use('/api/empresas', empresaParceiraRoutes)
 
 // ── Tratamento de erros (deve ser o último middleware) ──
 app.use(errorHandler)
