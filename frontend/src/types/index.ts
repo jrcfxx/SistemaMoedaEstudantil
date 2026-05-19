@@ -80,6 +80,42 @@ export interface CreateAlunoInput {
   instituicaoId: string;
 }
 
+export interface Vantagem {
+  id: string;
+  titulo: string;
+  descricao: string;
+  fotoUrl?: string;
+  custoMoedas: number;
+  empresaParceiraId: string;
+  empresa?: Pick<EmpresaParceira, 'id' | 'nome' | 'email'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Resgate {
+  id: string;
+  codigoCupom: string;
+  status: 'PENDENTE' | 'UTILIZADO';
+  alunoId: string;
+  vantagemId: string;
+  createdAt: string;
+  aluno?: Pick<Aluno, 'id' | 'nome' | 'email'>;
+  vantagem?: Vantagem;
+}
+
+export interface CreateVantagemInput {
+  titulo: string;
+  descricao: string;
+  fotoUrl?: string;
+  custoMoedas: number;
+  empresaParceiraId: string;
+}
+
+export interface ResgateInput {
+  alunoId: string;
+  vantagemId: string;
+}
+
 export interface CreateEmpresaParceiraInput {
   nome: string;
   email: string;

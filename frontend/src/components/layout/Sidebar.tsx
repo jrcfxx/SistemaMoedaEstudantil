@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   GraduationCap,
   BookOpen,
+  Gift,
   Building2,
   School,
   Settings,
@@ -21,6 +22,7 @@ const navItems: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/alunos', label: 'Alunos', icon: GraduationCap },
   { to: '/professores', label: 'Professores', icon: BookOpen },
+  { to: '/vantagens', label: 'Vantagens', icon: Gift },
   { to: '/empresas', label: 'Empresas Parceiras', icon: Building2 },
   { to: '/instituicoes', label: 'Instituições', icon: School },
 ];

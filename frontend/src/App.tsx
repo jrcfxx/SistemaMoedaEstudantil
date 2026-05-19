@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import AlunosList from './pages/alunos/AlunosList';
 import ProfessoresList from './pages/professores/ProfessoresList';
+import VantagensList from './pages/vantagens/VantagensList';
 import EmpresasList from './pages/empresas/EmpresasList';
 import InstituicoesList from './pages/instituicoes/InstituicoesList';
 import { authService } from './services/authService';
@@ -53,6 +54,16 @@ export default function App() {
             <RequireAuth>
               <Layout>
                 <ProfessoresList />
+              </Layout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/vantagens"
+          element={
+            <RequireAuth>
+              <Layout>
+                <VantagensList />
               </Layout>
             </RequireAuth>
           }

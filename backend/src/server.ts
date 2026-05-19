@@ -4,6 +4,7 @@ import cors from 'cors';
 import { authRoutes } from './routes/authRoutes';
 import { alunoRoutes } from './routes/alunoRoutes';
 import { professorRoutes } from './routes/professorRoutes';
+import { vantagemRoutes } from './routes/vantagemRoutes';
 import { empresaParceiraRoutes } from './routes/empresaParceiraRoutes';
 import { instituicaoRoutes } from './routes/instituicaoRoutes';
 import { dashboardRoutes } from './routes/dashboardRoutes';
@@ -28,6 +29,7 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/alunos', alunoRoutes);
 app.use('/api/professores', professorRoutes);
+app.use('/api/vantagens', vantagemRoutes);
 app.use('/api/empresas-parceiras', empresaParceiraRoutes);
 app.use('/api/instituicoes', instituicaoRoutes);
 app.use('/api/dashboard', dashboardRoutes);
