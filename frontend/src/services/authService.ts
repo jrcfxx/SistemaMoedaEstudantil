@@ -7,6 +7,7 @@ export interface AuthUser {
   tipo: string;
   alunoId?: string | null;
   empresaId?: string | null;
+  professorId?: string | null;
 }
 
 interface LoginResponse {

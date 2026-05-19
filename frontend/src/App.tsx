@@ -7,6 +7,8 @@ import ProfessoresList from './pages/professores/ProfessoresList';
 import VantagensList from './pages/vantagens/VantagensList';
 import EmpresasList from './pages/empresas/EmpresasList';
 import InstituicoesList from './pages/instituicoes/InstituicoesList';
+import ExtratoAluno from './pages/extrato/ExtratoAluno';
+import ExtratoProfessor from './pages/extrato/ExtratoProfessor';
 import { authService } from './services/authService';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -80,6 +82,22 @@ export default function App() {
           element={
             <ProtectedPage roles={['ADMIN']}>
               <InstituicoesList />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/extrato"
+          element={
+            <ProtectedPage roles={['ALUNO']}>
+              <ExtratoAluno />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/extrato-professor"
+          element={
+            <ProtectedPage roles={['PROFESSOR']}>
+              <ExtratoProfessor />
             </ProtectedPage>
           }
         />

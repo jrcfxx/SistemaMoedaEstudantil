@@ -43,6 +43,7 @@ export interface TransacaoMoeda {
   createdAt: string;
   aluno?: Pick<Aluno, 'id' | 'nome' | 'email'>;
   professor?: Pick<Professor, 'id' | 'nome'>;
+  vantagem?: Pick<Vantagem, 'id' | 'titulo'>;
 }
 
 export interface CreateProfessorInput {

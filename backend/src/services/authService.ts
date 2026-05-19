@@ -82,15 +82,17 @@ export const authService = {
     });
     if (!usuario) throw new AppError('Usuário não encontrado', 404);
 
-    const [aluno, empresa] = await Promise.all([
+    const [aluno, empresa, professor] = await Promise.all([
       prisma.aluno.findFirst({ where: { email: usuario.email }, select: { id: true } }),
       prisma.empresaParceira.findFirst({ where: { email: usuario.email }, select: { id: true } }),
+      prisma.professor.findFirst({ where: { usuarioId: userId }, select: { id: true } }),
     ]);
 
     return {
       ...usuario,
       alunoId: aluno?.id ?? null,
       empresaId: empresa?.id ?? null,
+      professorId: professor?.id ?? null,
     };
   },
 

@@ -5,6 +5,7 @@ import { resgateRepository } from '../repositories/resgateRepository';
 import { alunoRepository } from '../repositories/alunoRepository';
 import { empresaParceiraRepository } from '../repositories/empresaParceiraRepository';
 import { AppError } from '../middlewares/errorHandler';
+import { publishEmail } from '../lib/emailQueue';
 import {
   CreateVantagemInput,
   UpdateVantagemInput,
@@ -109,10 +110,21 @@ export const vantagemService = {
         },
       });
 
-      return {
-        resgate,
-        saldoRestante: aluno.saldoMoedas - vantagem.custoMoedas,
-      };
+      const saldoRestante = aluno.saldoMoedas - vantagem.custoMoedas;
+
+      publishEmail({
+        tipo: 'RESGATE_REALIZADO',
+        destinatarioAluno: aluno.email,
+        nomeAluno: aluno.nome,
+        destinatarioEmpresa: resgate.vantagem.empresa.email,
+        nomeEmpresa: resgate.vantagem.empresa.nome,
+        tituloVantagem: vantagem.titulo,
+        custoMoedas: vantagem.custoMoedas,
+        codigoCupom,
+        saldoRestante,
+      });
+
+      return { resgate, saldoRestante };
     });
   },
 

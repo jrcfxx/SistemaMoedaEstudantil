@@ -23,6 +23,12 @@ export const alunoService = {
     return aluno;
   },
 
+  findTransacoes: async (id: string) => {
+    const aluno = await alunoRepository.findById(id);
+    if (!aluno) throw new AppError('Aluno não encontrado', 404);
+    return alunoRepository.findTransacoes(id);
+  },
+
   create: async (data: CreateAlunoInput) => {
     const parsed = createAlunoSchema.parse(data);
     parsed.cpf = normalizeCpf(parsed.cpf);

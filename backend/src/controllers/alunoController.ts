@@ -49,4 +49,12 @@ export const alunoController = {
       next(error);
     }
   },
+
+  findTransacoes: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      res.json(await alunoService.findTransacoes(req.params.id));
+    } catch (error) {
+      next(error);
+    }
+  },
 };

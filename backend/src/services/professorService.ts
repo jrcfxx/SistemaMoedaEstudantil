@@ -3,6 +3,7 @@ import { professorRepository } from '../repositories/professorRepository';
 import { alunoRepository } from '../repositories/alunoRepository';
 import { instituicaoRepository } from '../repositories/instituicaoRepository';
 import { AppError } from '../middlewares/errorHandler';
+import { publishEmail } from '../lib/emailQueue';
 import {
   CreateProfessorInput,
   UpdateProfessorInput,
@@ -109,10 +110,22 @@ export const professorService = {
         },
       });
 
-      return {
+      const result = {
         transacao,
         saldoProfessor: professor.saldoMoedas - valor,
       };
+
+      publishEmail({
+        tipo: 'MOEDAS_RECEBIDAS',
+        destinatario: aluno.email,
+        nomeAluno: aluno.nome,
+        nomeProfessor: professor.nome,
+        valor,
+        motivo,
+        saldoAtual: aluno.saldoMoedas + valor,
+      });
+
+      return result;
     });
   },
 };

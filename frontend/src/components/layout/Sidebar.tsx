@@ -8,6 +8,7 @@ import {
   School,
   Coins,
   LogOut,
+  ReceiptText,
 } from 'lucide-react';
 import { authService } from '../../services/authService';
 
@@ -21,6 +22,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/vantagens', label: 'Vantagens', icon: Gift },
+  { to: '/extrato', label: 'Meu Extrato', icon: ReceiptText, roles: ['ALUNO'] },
+  { to: '/extrato-professor', label: 'Meu Extrato', icon: ReceiptText, roles: ['PROFESSOR'] },
   { to: '/alunos', label: 'Alunos', icon: GraduationCap, roles: ['ADMIN', 'PROFESSOR'] },
   { to: '/professores', label: 'Professores', icon: BookOpen, roles: ['ADMIN'] },
   { to: '/empresas', label: 'Empresas Parceiras', icon: Building2, roles: ['ADMIN'] },
@@ -43,7 +46,7 @@ export function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 h-full w-64 bg-sidebar flex flex-col z-30">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-indigo-800">
+      <div className="px-6 py-4 border-b border-indigo-800">
         <div className="flex items-center gap-3">
           <div className="bg-gold/20 p-2 rounded-xl">
             <Coins className="w-6 h-6 text-gold" />
@@ -79,7 +82,7 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-4 border-t border-indigo-800">
+      <div className="px-3 pb-4 border-t border-indigo-800 pt-3">
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors w-full"

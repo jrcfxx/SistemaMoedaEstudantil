@@ -1,5 +1,5 @@
 import { api } from './api';
-import { Aluno, CreateAlunoInput } from '../types';
+import { Aluno, CreateAlunoInput, TransacaoMoeda } from '../types';
 
 export const alunoService = {
   findAll: async (search?: string): Promise<Aluno[]> => {
@@ -25,5 +25,10 @@ export const alunoService = {
 
   delete: async (id: string): Promise<void> => {
     await api.delete(`/alunos/${id}`);
+  },
+
+  findTransacoes: async (id: string): Promise<TransacaoMoeda[]> => {
+    const { data } = await api.get<TransacaoMoeda[]>(`/alunos/${id}/transacoes`);
+    return data;
   },
 };

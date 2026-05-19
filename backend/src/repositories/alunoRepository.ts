@@ -53,6 +53,17 @@ export const alunoRepository = {
     return prisma.aluno.delete({ where: { id } });
   },
 
+  findTransacoes: (alunoId: string) => {
+    return prisma.transacaoMoeda.findMany({
+      where: { alunoId },
+      include: {
+        professor: { select: { id: true, nome: true } },
+        vantagem: { select: { id: true, titulo: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  },
+
   count: () => {
     return prisma.aluno.count();
   },

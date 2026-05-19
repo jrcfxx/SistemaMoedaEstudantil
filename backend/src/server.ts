@@ -9,6 +9,8 @@ import { empresaParceiraRoutes } from './routes/empresaParceiraRoutes';
 import { instituicaoRoutes } from './routes/instituicaoRoutes';
 import { dashboardRoutes } from './routes/dashboardRoutes';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
+import { connectRabbitMQ } from './lib/rabbitmq';
+import { startEmailWorker } from './workers/emailWorker';
 
 const app = express();
 const PORT = process.env.PORT || 3333;
@@ -37,7 +39,9 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
   console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
+  await connectRabbitMQ();
+  startEmailWorker();
 });

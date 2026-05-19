@@ -66,9 +66,10 @@ O **Sistema de Moeda Estudantil** é uma aplicação web Full-Stack projetada pa
 - 🔒 **Autenticação JWT:** Login seguro com token JWT, middleware de autenticação e autorização por papel (ALUNO, PROFESSOR, EMPRESA, ADMIN).
 - 👨‍🏫 **Módulo de Professor:** Cadastro, edição, consulta e distribuição de moedas com validação de saldo em tempo real e registro atômico de transações.
 - 💰 **Distribuição de Moedas:** Professor envia moedas a um aluno com motivo obrigatório; transação atômica garante consistência do saldo.
-- 🎁 **Resgate de Vantagens:** Aluno seleciona uma vantagem, tem o saldo descontado e recebe cupom *(em desenvolvimento — Sprint 03)*.
-- 📋 **Extrato de Conta:** Alunos e professores consultam histórico completo de transações *(em desenvolvimento — Sprint 03)*.
-- 📧 **Notificações por E-mail:** Envio automático ao receber moedas e ao resgatar vantagens *(em desenvolvimento — Sprint 03)*.
+- 🎁 **Resgate de Vantagens:** Aluno seleciona uma vantagem, tem o saldo descontado e recebe cupom único gerado automaticamente.
+- 📋 **Extrato de Conta:** Alunos e professores consultam histórico completo de transações, com resumo de saldo e cupons resgatados.
+- 📧 **Notificações por E-mail:** Envio automático via RabbitMQ (fila assíncrona) ao receber moedas e ao resgatar vantagens.
+- 🐰 **RabbitMQ:** Broker de mensagens para processamento assíncrono de notificações por e-mail.
 
 ---
 
@@ -91,7 +92,8 @@ A stack foi escolhida com foco em TypeScript unificado em toda a aplicação e a
 | **Roteamento** | [React Router v6](https://reactrouter.com/) | SPA com navegação sem reload |
 | **Ícones** | [Lucide React](https://lucide.dev/) | SVG tree-shakeable e moderno |
 | **Autenticação** | [JWT](https://jwt.io/) + [bcryptjs](https://github.com/dcodeIO/bcrypt.js) | Autenticação stateless; hash seguro de senhas |
-| **E-mail** | Nodemailer *(em desenvolvimento — Sprint 03)* | Notificações e cupons |
+| **E-mail** | [Nodemailer](https://nodemailer.com/) | Notificações de moedas recebidas e cupons de resgate |
+| **Mensageria** | [RabbitMQ 3.13](https://www.rabbitmq.com/) + [amqplib](https://github.com/amqp-node/amqplib) | Processamento assíncrono de e-mails via fila durável |
 | **Containerização** | [Docker](https://www.docker.com/) + [Docker Compose](https://docs.docker.com/compose/) | PostgreSQL local sem instalação manual |
 | **Controle de Versão** | [Git](https://git-scm.com/) + [GitHub](https://github.com/) | Versionamento e colaboração |
 
@@ -103,8 +105,12 @@ A stack foi escolhida com foco em TypeScript unificado em toda a aplicação e a
 Frontend (React + Vite  →  :5173)
     └── Axios  →  /api/*  (proxy Vite)
          └── Backend (Express  →  :3333)
-              └── Controller → Service → Repository → Prisma → PostgreSQL (:5432)
+              ├── Controller → Service → Repository → Prisma → PostgreSQL (:5432)
+              └── Service → EmailQueue (producer) → RabbitMQ (:5672)
+                                                          └── EmailWorker (consumer) → Nodemailer → SMTP
 ```
+
+**Painel RabbitMQ Management:** `http://localhost:15672` (guest/guest)
 
 ### Camadas do back-end
 
@@ -180,9 +186,9 @@ Cada incremento representa uma entrega funcional ou artefato de projeto vinculad
 | 12 | CRUD de Instituição (back-end + front-end) + Dashboard | Sprint 02 | ✅ Concluído |
 | 13 | Autenticação e autorização (JWT + bcryptjs + middleware de roles) | Sprint 03 | ✅ Concluído |
 | 14 | Módulo de Professor: CRUD + distribuição de moedas com validação de saldo | Sprint 03 | ✅ Concluído |
-| 15 | Módulo de Aluno: resgate de vantagens + geração de cupom com código único | Sprint 03 | ⏳ Pendente |
-| 16 | Notificações por e-mail (recebimento de moedas e resgate de vantagem) | Sprint 03 | ⏳ Pendente |
-| 17 | Extrato de conta (professores e alunos) | Sprint 03 | ⏳ Pendente |
+| 15 | Módulo de Aluno: resgate de vantagens + geração de cupom com código único | Sprint 03 | ✅ Concluído |
+| 16 | Notificações por e-mail (recebimento de moedas e resgate de vantagem) via RabbitMQ | Sprint 03 | ✅ Concluído |
+| 17 | Extrato de conta (professores e alunos) | Sprint 03 | ✅ Concluído |
 | 18 | Diagrama de Arquitetura + slides para apresentação final | Sprint 03 | ⏳ Pendente |
 
 > **Legenda:** ✅ Concluído &nbsp;|&nbsp; 🔄 Em andamento &nbsp;|&nbsp; ⏳ Pendente
@@ -416,11 +422,11 @@ SistemaMoedaEstudantil/
 |---|---|---|:---:|
 | HU01 | Como aluno, quero me cadastrar no sistema para participar do programa de moeda estudantil. | Informar nome, e-mail, CPF, RG, endereço, instituição e curso. | ✅ Sprint 02 |
 | HU02 | Como aluno, quero fazer login para acessar minhas funcionalidades com segurança. | O sistema deve validar e-mail e senha antes de liberar acesso. | ✅ Sprint 03 |
-| HU03 | Como aluno, quero consultar meu saldo para saber quantas moedas possuo. | O sistema deve exibir o saldo atualizado. | ⏳ Sprint 03 |
-| HU04 | Como aluno, quero consultar meu extrato para acompanhar moedas recebidas e vantagens resgatadas. | O extrato deve listar data, tipo da transação, valor e descrição. | ⏳ Sprint 03 |
-| HU05 | Como aluno, quero visualizar vantagens disponíveis para escolher onde gastar minhas moedas. | O sistema deve listar vantagens com descrição, foto, empresa e custo em moedas. | ⏳ Sprint 03 |
-| HU06 | Como aluno, quero resgatar uma vantagem para trocar minhas moedas por benefícios. | O sistema deve validar saldo, descontar moedas e gerar um código de cupom. | ⏳ Sprint 03 |
-| HU07 | Como aluno, quero receber um e-mail com o cupom para apresentar na troca presencial. | O e-mail deve conter o código gerado pelo sistema e dados da vantagem. | ⏳ Sprint 03 |
+| HU03 | Como aluno, quero consultar meu saldo para saber quantas moedas possuo. | O sistema deve exibir o saldo atualizado. | ✅ Sprint 03 |
+| HU04 | Como aluno, quero consultar meu extrato para acompanhar moedas recebidas e vantagens resgatadas. | O extrato deve listar data, tipo da transação, valor e descrição. | ✅ Sprint 03 |
+| HU05 | Como aluno, quero visualizar vantagens disponíveis para escolher onde gastar minhas moedas. | O sistema deve listar vantagens com descrição, foto, empresa e custo em moedas. | ✅ Sprint 03 |
+| HU06 | Como aluno, quero resgatar uma vantagem para trocar minhas moedas por benefícios. | O sistema deve validar saldo, descontar moedas e gerar um código de cupom. | ✅ Sprint 03 |
+| HU07 | Como aluno, quero receber um e-mail com o cupom para apresentar na troca presencial. | O e-mail deve conter o código gerado pelo sistema e dados da vantagem. | ✅ Sprint 03 |
 
 ### Professor
 
@@ -430,15 +436,15 @@ SistemaMoedaEstudantil/
 | HU09 | Como professor, quero receber 1.000 moedas por semestre para distribuir aos alunos. | O saldo semestral deve ser acumulado ao saldo existente. | ✅ Sprint 03 |
 | HU10 | Como professor, quero enviar moedas a um aluno para reconhecer seu mérito. | Deve selecionar aluno, informar quantidade e motivo obrigatório. | ✅ Sprint 03 |
 | HU11 | Como professor, quero que o sistema valide meu saldo antes do envio. | A transação só deve ocorrer se houver saldo suficiente. | ✅ Sprint 03 |
-| HU12 | Como professor, quero consultar meu extrato para ver as moedas que distribuí. | O extrato deve mostrar envios realizados, alunos, valores, datas e motivos. | ⏳ Sprint 03 |
+| HU12 | Como professor, quero consultar meu extrato para ver as moedas que distribuí. | O extrato deve mostrar envios realizados, alunos, valores, datas e motivos. | ✅ Sprint 03 |
 
 ### Empresa Parceira
 
 | ID | História do Usuário | Critérios de Aceitação | Status |
 |---|---|---|:---:|
 | HU13 | Como empresa parceira, quero me cadastrar no sistema para oferecer vantagens aos alunos. | Deve informar dados da empresa, login e senha. | ✅ Sprint 02 |
-| HU14 | Como empresa parceira, quero cadastrar vantagens para que alunos possam resgatá-las. | Deve informar título, descrição, foto e custo em moedas. | ⏳ Sprint 03 |
-| HU15 | Como empresa parceira, quero receber um e-mail quando uma vantagem for resgatada. | O e-mail deve conter código de validação, aluno e vantagem resgatada. | ⏳ Sprint 03 |
+| HU14 | Como empresa parceira, quero cadastrar vantagens para que alunos possam resgatá-las. | Deve informar título, descrição, foto e custo em moedas. | ✅ Sprint 03 |
+| HU15 | Como empresa parceira, quero receber um e-mail quando uma vantagem for resgatada. | O e-mail deve conter código de validação, aluno e vantagem resgatada. | ✅ Sprint 03 |
 
 ### Administrador / Sistema
 
@@ -446,7 +452,7 @@ SistemaMoedaEstudantil/
 |---|---|---|:---:|
 | HU16 | Como administrador, quero manter instituições pré-cadastradas para vincular alunos e professores. | O aluno deve selecionar uma instituição existente. | ✅ Sprint 02 |
 | HU17 | Como administrador, quero manter professores pré-cadastrados representando os docentes das instituições. | Cada professor deve possuir nome, CPF, departamento e instituição. | ✅ Sprint 03 |
-| HU18 | Como sistema, quero enviar notificações por e-mail em eventos importantes. | O envio deve ocorrer ao receber moedas e ao resgatar vantagens. | ⏳ Sprint 03 |
+| HU18 | Como sistema, quero enviar notificações por e-mail em eventos importantes. | O envio deve ocorrer ao receber moedas e ao resgatar vantagens. | ✅ Sprint 03 |
 
 ---
 

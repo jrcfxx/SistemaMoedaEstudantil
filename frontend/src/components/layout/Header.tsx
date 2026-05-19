@@ -1,6 +1,9 @@
-import { Bell, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { authService } from '../../services/authService';
+import { alunoService } from '../../services/alunoService';
+import { professorService } from '../../services/professorService';
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'Administrador',
@@ -16,6 +19,8 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/empresas': { title: 'Empresas Parceiras', subtitle: 'Gerenciamento de empresas parceiras' },
   '/instituicoes': { title: 'Instituições', subtitle: 'Gerenciamento de instituições de ensino' },
   '/vantagens': { title: 'Vantagens', subtitle: 'Catálogo de vantagens disponíveis' },
+  '/extrato': { title: 'Meu Extrato', subtitle: 'Histórico de transações e cupons' },
+  '/extrato-professor': { title: 'Meu Extrato', subtitle: 'Histórico de moedas distribuídas' },
   '/configuracoes': { title: 'Configurações', subtitle: 'Configurações do sistema' },
 };
 
@@ -23,6 +28,24 @@ export function Header() {
   const { pathname } = useLocation();
   const user = authService.getUser();
   const page = pageTitles[pathname] ?? { title: 'Moeda Estudantil', subtitle: '' };
+
+  const [saldo, setSaldo] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (user?.tipo === 'ALUNO' && user.alunoId) {
+      alunoService.findById(user.alunoId)
+        .then((a) => setSaldo(a.saldoMoedas))
+        .catch(() => {});
+    } else if (user?.tipo === 'PROFESSOR' && user.professorId) {
+      professorService.findById(user.professorId)
+        .then((p) => setSaldo(p.saldoMoedas))
+        .catch(() => {});
+    } else {
+      setSaldo(null);
+    }
+  }, [pathname, user?.alunoId, user?.professorId, user?.tipo]);
+
+  const mostraSaldo = (user?.tipo === 'ALUNO' || user?.tipo === 'PROFESSOR') && saldo !== null;
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-20">
@@ -32,12 +55,17 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-3">
-        <button
-          className="relative p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-          aria-label="Notificações"
-        >
-          <Bell className="w-5 h-5" />
-        </button>
+        {mostraSaldo && (
+          <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-1.5">
+            <span className="text-lg leading-none">🪙</span>
+            <div>
+              <p className="text-xs text-amber-600 font-medium leading-none">
+                {user?.tipo === 'ALUNO' ? 'Seu saldo' : 'Para distribuir'}
+              </p>
+              <p className="text-sm font-bold text-amber-700 leading-tight">{saldo} moedas</p>
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200">
           <div className="bg-primary-100 text-primary-700 rounded-full p-1.5">
