@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, GraduationCap, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash2, GraduationCap, Coins } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { Spinner } from '../../components/ui/Spinner';
@@ -7,8 +7,11 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { ConfirmDeleteDialog } from '../../components/ui/ConfirmDeleteDialog';
 import { Badge } from '../../components/ui/Badge';
 import { AlunoForm } from './AlunoForm';
+import { DistribuirMoedasModal } from '../professores/DistribuirMoedasModal';
 import { alunoService } from '../../services/alunoService';
-import { Aluno } from '../../types';
+import { professorService } from '../../services/professorService';
+import { authService } from '../../services/authService';
+import { Aluno, Professor } from '../../types';
 
 function formatCpf(cpf: string) {
   const n = cpf.replace(/\D/g, '');
@@ -24,6 +27,22 @@ export default function AlunosList() {
   const [deleteTarget, setDeleteTarget] = useState<Aluno | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
+
+  const [professor, setProfessor] = useState<Professor | null>(null);
+  const [distribuirTarget, setDistribuirTarget] = useState<Aluno | null>(null);
+
+  const user = authService.getUser();
+  const isProfessor = user?.tipo === 'PROFESSOR';
+  const isAdmin = user?.tipo === 'ADMIN';
+
+  // Busca dados do professor logado
+  useEffect(() => {
+    if (isProfessor && user?.professorId) {
+      professorService.findById(user.professorId)
+        .then(setProfessor)
+        .catch(() => {});
+    }
+  }, [isProfessor, user?.professorId]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -68,6 +87,14 @@ export default function AlunosList() {
     }
   };
 
+  const handleDistribuirSuccess = () => {
+    load();
+    // Atualiza saldo do professor no estado
+    if (user?.professorId) {
+      professorService.findById(user.professorId).then(setProfessor).catch(() => {});
+    }
+  };
+
   return (
     <div className="space-y-5">
       {/* Toolbar */}
@@ -77,10 +104,12 @@ export default function AlunosList() {
           onChange={setSearch}
           placeholder="Buscar por nome, e-mail, CPF..."
         />
-        <Button onClick={handleNew}>
-          <Plus className="w-4 h-4" />
-          Novo aluno
-        </Button>
+        {isAdmin && (
+          <Button onClick={handleNew}>
+            <Plus className="w-4 h-4" />
+            Novo aluno
+          </Button>
+        )}
       </div>
 
       {error && (
@@ -98,7 +127,7 @@ export default function AlunosList() {
             icon={GraduationCap}
             title="Nenhum aluno encontrado"
             description={search ? 'Tente outros termos de busca.' : 'Cadastre o primeiro aluno.'}
-            action={search ? undefined : { label: 'Cadastrar aluno', onClick: handleNew }}
+            action={isAdmin && !search ? { label: 'Cadastrar aluno', onClick: handleNew } : undefined}
           />
         ) : (
           <div className="overflow-x-auto">
@@ -140,26 +169,34 @@ export default function AlunosList() {
                     </td>
                     <td className="table-cell">
                       <div className="flex items-center justify-center gap-1">
-                        <button
-                          title="Ver detalhes"
-                          className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                          title="Editar"
-                          onClick={() => handleEdit(aluno)}
-                          className="p-1.5 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
-                        <button
-                          title="Excluir"
-                          onClick={() => setDeleteTarget(aluno)}
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {/* Botão de distribuir moedas — visível para PROFESSOR */}
+                        {isProfessor && professor && (
+                          <button
+                            title="Enviar moedas"
+                            onClick={() => setDistribuirTarget(aluno)}
+                            className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                          >
+                            <Coins className="w-4 h-4" />
+                          </button>
+                        )}
+                        {isAdmin && (
+                          <>
+                            <button
+                              title="Editar"
+                              onClick={() => handleEdit(aluno)}
+                              className="p-1.5 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              title="Excluir"
+                              onClick={() => setDeleteTarget(aluno)}
+                              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -179,6 +216,16 @@ export default function AlunosList() {
         onSuccess={load}
         aluno={selectedAluno}
       />
+
+      {professor && distribuirTarget && (
+        <DistribuirMoedasModal
+          open={!!distribuirTarget}
+          professor={professor}
+          alunoIdInicial={distribuirTarget.id}
+          onClose={() => setDistribuirTarget(null)}
+          onSuccess={handleDistribuirSuccess}
+        />
+      )}
 
       <ConfirmDeleteDialog
         open={!!deleteTarget}

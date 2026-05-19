@@ -27,6 +27,7 @@ type FormData = z.infer<typeof schema>;
 interface DistribuirMoedasModalProps {
   open: boolean;
   professor: Professor;
+  alunoIdInicial?: string;
   onClose: () => void;
   onSuccess?: () => void;
 }
@@ -34,6 +35,7 @@ interface DistribuirMoedasModalProps {
 export function DistribuirMoedasModal({
   open,
   professor,
+  alunoIdInicial,
   onClose,
   onSuccess,
 }: DistribuirMoedasModalProps) {
@@ -64,12 +66,12 @@ export function DistribuirMoedasModal({
 
   useEffect(() => {
     if (open) {
-      reset({ alunoId: '', valor: undefined, motivo: '' });
+      reset({ alunoId: alunoIdInicial ?? '', valor: undefined, motivo: '' });
       setSaldoAtual(professor.saldoMoedas);
       setError('');
       setSucesso('');
     }
-  }, [open, professor, reset]);
+  }, [open, professor, alunoIdInicial, reset]);
 
   const onSubmit = async (data: FormData) => {
     if (saldoInsuficiente) return;
