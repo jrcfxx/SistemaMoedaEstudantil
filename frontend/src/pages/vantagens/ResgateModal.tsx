@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { vantagemService } from '../../services/vantagemService';
 import { alunoService } from '../../services/alunoService';
 import { authService } from '../../services/authService';
-import { Vantagem, Aluno, Resgate } from '../../types';
+import { Vantagem, Resgate } from '../../types';
 
 type Etapa = 'confirmar' | 'sucesso';
 
@@ -13,15 +13,14 @@ interface ResgateModalProps {
   open: boolean;
   vantagem: Vantagem;
   onClose: () => void;
-  onSuccess: () => void;
 }
 
-export function ResgateModal({ open, vantagem, onClose, onSuccess }: ResgateModalProps) {
+export function ResgateModal({ open, vantagem, onClose }: ResgateModalProps) {
   const [etapa, setEtapa] = useState<Etapa>('confirmar');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [aluno, setAluno] = useState<Aluno | null>(null);
   const [resgate, setResgate] = useState<Resgate | null>(null);
+  const [saldoAtual, setSaldoAtual] = useState<number | null>(null);
   const [saldoRestante, setSaldoRestante] = useState(0);
   const [copiado, setCopiado] = useState(false);
 
@@ -34,26 +33,32 @@ export function ResgateModal({ open, vantagem, onClose, onSuccess }: ResgateModa
     setResgate(null);
     setCopiado(false);
 
-    if (user) {
-      alunoService.findAll().then((lista) => {
-        const encontrado = lista.find((a) => a.email === user.email) ?? null;
-        setAluno(encontrado);
-      }).catch(() => {});
+    if (user?.alunoId) {
+      vantagemService.findResgatesByAluno(user.alunoId)
+        .then(() => {})
+        .catch(() => {});
     }
-  }, [open, user]);
+  }, [open, user?.id]);
 
-  const saldoSuficiente = aluno !== null && aluno.saldoMoedas >= vantagem.custoMoedas;
+  useEffect(() => {
+    if (!open || !user?.alunoId) return;
+    alunoService.findById(user.alunoId).then((a) => setSaldoAtual(a.saldoMoedas)).catch(() => {});
+  }, [open, user?.alunoId]);
+
+  const saldoSuficiente = saldoAtual !== null && saldoAtual >= vantagem.custoMoedas;
+  const semCadastroAluno = !user?.alunoId && user?.tipo !== 'ADMIN';
 
   const handleConfirmar = async () => {
-    if (!aluno) return;
     setLoading(true);
     setError('');
     try {
-      const result = await vantagemService.resgatar({ alunoId: aluno.id, vantagemId: vantagem.id });
+      const body = user?.tipo === 'ALUNO'
+        ? { vantagemId: vantagem.id }
+        : { alunoId: user?.alunoId, vantagemId: vantagem.id };
+      const result = await vantagemService.resgatar(body as { alunoId: string; vantagemId: string });
       setResgate(result.resgate);
       setSaldoRestante(result.saldoRestante);
       setEtapa('sucesso');
-      onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao resgatar vantagem');
     } finally {
@@ -88,32 +93,34 @@ export function ResgateModal({ open, vantagem, onClose, onSuccess }: ResgateModa
             </div>
           </div>
 
-          {/* Saldo do aluno */}
-          {aluno ? (
+          {/* Saldo */}
+          {semCadastroAluno ? (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-amber-700 text-sm">
+              Seu usuário não está vinculado a um cadastro de aluno.
+            </div>
+          ) : saldoAtual !== null ? (
             <div className={`rounded-xl px-4 py-3 border flex items-center justify-between ${saldoSuficiente ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
               <div>
                 <p className={`text-xs font-medium uppercase tracking-wide ${saldoSuficiente ? 'text-green-600' : 'text-red-500'}`}>
                   Seu saldo atual
                 </p>
                 <p className={`text-xl font-bold mt-0.5 ${saldoSuficiente ? 'text-green-700' : 'text-red-600'}`}>
-                  🪙 {aluno.saldoMoedas}
+                  🪙 {saldoAtual}
                 </p>
               </div>
-              {saldoSuficiente ? (
-                <CheckCircle2 className="w-6 h-6 text-green-400" />
-              ) : (
-                <AlertCircle className="w-6 h-6 text-red-400" />
-              )}
+              {saldoSuficiente
+                ? <CheckCircle2 className="w-6 h-6 text-green-400" />
+                : <AlertCircle className="w-6 h-6 text-red-400" />}
             </div>
           ) : (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-amber-700 text-sm">
-              Não foi possível identificar seu cadastro de aluno.
+            <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-500 text-sm animate-pulse">
+              Carregando saldo...
             </div>
           )}
 
-          {!saldoSuficiente && aluno && (
+          {!saldoSuficiente && saldoAtual !== null && (
             <p className="text-red-600 text-sm text-center">
-              Saldo insuficiente — faltam 🪙 {vantagem.custoMoedas - aluno.saldoMoedas} moeda(s).
+              Saldo insuficiente — faltam 🪙 {vantagem.custoMoedas - saldoAtual} moeda(s).
             </p>
           )}
 
@@ -132,7 +139,7 @@ export function ResgateModal({ open, vantagem, onClose, onSuccess }: ResgateModa
               className="flex-1"
               onClick={handleConfirmar}
               loading={loading}
-              disabled={!saldoSuficiente || !aluno}
+              disabled={semCadastroAluno || !saldoSuficiente}
             >
               <Gift className="w-4 h-4" />
               Confirmar resgate

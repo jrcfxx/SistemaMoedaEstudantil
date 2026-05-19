@@ -27,6 +27,7 @@ export default function VantagensList() {
 
   const user = authService.getUser();
   const podeGerir = user ? ROLES_GESTAO.includes(user.tipo) : false;
+  const podeResgatar = user?.tipo === 'ALUNO';
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -119,13 +120,15 @@ export default function VantagensList() {
                     <Badge label={v.empresa.nome} variant="info" />
                   )}
                   <div className="flex gap-2 mt-1">
-                    <Button
-                      className="flex-1 text-xs py-1.5"
-                      onClick={() => setResgateTarget(v)}
-                    >
-                      <Gift className="w-3.5 h-3.5" />
-                      Resgatar
-                    </Button>
+                    {podeResgatar && (
+                      <Button
+                        className="flex-1 text-xs py-1.5"
+                        onClick={() => setResgateTarget(v)}
+                      >
+                        <Gift className="w-3.5 h-3.5" />
+                        Resgatar
+                      </Button>
+                    )}
                     {podeGerir && (
                       <>
                         <button
@@ -163,8 +166,7 @@ export default function VantagensList() {
         <ResgateModal
           open={!!resgateTarget}
           vantagem={resgateTarget}
-          onClose={() => setResgateTarget(null)}
-          onSuccess={() => { setResgateTarget(null); load(); }}
+          onClose={() => { setResgateTarget(null); load(); }}
         />
       )}
 

@@ -13,6 +13,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public details?: Record<string, string>,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -21,7 +31,8 @@ api.interceptors.response.use(
       localStorage.removeItem('auth_user');
       window.location.href = '/login';
     }
-    const message = error.response?.data?.error || 'Erro ao comunicar com o servidor';
-    return Promise.reject(new Error(message));
+    const message = error.response?.data?.error ?? 'Erro ao comunicar com o servidor';
+    const details = error.response?.data?.details;
+    return Promise.reject(new ApiError(message, details));
   },
 );

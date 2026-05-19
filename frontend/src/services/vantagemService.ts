@@ -42,6 +42,7 @@ export const vantagemService = {
     return data;
   },
 
+
   findResgatesByAluno: async (alunoId: string): Promise<Resgate[]> => {
     const { data } = await api.get<Resgate[]>(`/vantagens/resgates/aluno/${alunoId}`);
     return data;

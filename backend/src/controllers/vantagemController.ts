@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { vantagemService } from '../services/vantagemService';
 
 type IdParam = { id: string };
+type EmpresaParam = { empresaParceiraId: string };
 
 export const vantagemController = {
   findAll: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -17,9 +18,9 @@ export const vantagemController = {
     } catch (err) { next(err); }
   },
 
-  findByEmpresa: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
+  findByEmpresa: async (req: Request<EmpresaParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
-      res.json(await vantagemService.findByEmpresa(req.params.id));
+      res.json(await vantagemService.findByEmpresa(req.params.empresaParceiraId));
     } catch (err) { next(err); }
   },
 
@@ -44,7 +45,12 @@ export const vantagemController = {
 
   resgatar: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      res.status(201).json(await vantagemService.resgatar(req.body));
+      const payload = req.body;
+      if (req.user?.tipo === 'ALUNO') {
+        const aluno = await vantagemService.findAlunoByEmail(req.user.email);
+        payload.alunoId = aluno.id;
+      }
+      res.status(201).json(await vantagemService.resgatar(payload));
     } catch (err) { next(err); }
   },
 

@@ -183,8 +183,8 @@ export default function ProfessoresList() {
         <DistribuirMoedasModal
           open={!!distribuirTarget}
           professor={distribuirTarget}
-          onClose={() => setDistribuirTarget(null)}
-          onSuccess={() => { setDistribuirTarget(null); load(); }}
+          onClose={() => { setDistribuirTarget(null); load(); }}
+          onSuccess={load}
         />
       )}
 

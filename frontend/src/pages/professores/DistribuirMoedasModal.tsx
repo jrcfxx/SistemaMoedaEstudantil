@@ -28,7 +28,7 @@ interface DistribuirMoedasModalProps {
   open: boolean;
   professor: Professor;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 export function DistribuirMoedasModal({
@@ -78,11 +78,10 @@ export function DistribuirMoedasModal({
     setSucesso('');
     try {
       const result = await professorService.distribuirMoedas(professor.id, data);
-      setSaldoAtual(result.saldoProfessor);
       const alunoNome = alunos.find((a) => a.id === data.alunoId)?.nome ?? 'aluno';
       setSucesso(`${data.valor} moeda(s) enviada(s) para ${alunoNome} com sucesso!`);
       reset({ alunoId: '', valor: undefined, motivo: '' });
-      onSuccess();
+      onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao distribuir moedas');
     } finally {

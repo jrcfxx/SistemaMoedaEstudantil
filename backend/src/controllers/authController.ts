@@ -23,6 +23,15 @@ export const authController = {
     }
   },
 
+  registerAdmin: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const result = await authService.registerAdmin(req.body);
+      res.status(201).json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+
   me: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await authService.me(req.user!.sub);

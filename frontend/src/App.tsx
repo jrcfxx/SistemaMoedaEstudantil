@@ -13,79 +13,74 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return authService.isAuthenticated() ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
+function RequireRole({
+  roles,
+  children,
+}: {
+  roles: string[];
+  children: React.ReactNode;
+}) {
+  const user = authService.getUser();
+  if (!user || !roles.includes(user.tipo)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <>{children}</>;
+}
+
+function ProtectedPage({
+  children,
+  roles,
+}: {
+  children: React.ReactNode;
+  roles?: string[];
+}) {
+  return (
+    <RequireAuth>
+      <Layout>
+        {roles ? <RequireRole roles={roles}>{children}</RequireRole> : children}
+      </Layout>
+    </RequireAuth>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/"
-          element={
-            <RequireAuth>
-              <Layout>
-                <Navigate to="/dashboard" replace />
-              </Layout>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <RequireAuth>
-              <Layout>
-                <Dashboard />
-              </Layout>
-            </RequireAuth>
-          }
-        />
+        <Route path="/" element={<ProtectedPage><Navigate to="/dashboard" replace /></ProtectedPage>} />
+        <Route path="/dashboard" element={<ProtectedPage><Dashboard /></ProtectedPage>} />
+        <Route path="/vantagens" element={<ProtectedPage><VantagensList /></ProtectedPage>} />
         <Route
           path="/alunos"
           element={
-            <RequireAuth>
-              <Layout>
-                <AlunosList />
-              </Layout>
-            </RequireAuth>
+            <ProtectedPage roles={['ADMIN', 'PROFESSOR']}>
+              <AlunosList />
+            </ProtectedPage>
           }
         />
         <Route
           path="/professores"
           element={
-            <RequireAuth>
-              <Layout>
-                <ProfessoresList />
-              </Layout>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/vantagens"
-          element={
-            <RequireAuth>
-              <Layout>
-                <VantagensList />
-              </Layout>
-            </RequireAuth>
+            <ProtectedPage roles={['ADMIN']}>
+              <ProfessoresList />
+            </ProtectedPage>
           }
         />
         <Route
           path="/empresas"
           element={
-            <RequireAuth>
-              <Layout>
-                <EmpresasList />
-              </Layout>
-            </RequireAuth>
+            <ProtectedPage roles={['ADMIN']}>
+              <EmpresasList />
+            </ProtectedPage>
           }
         />
         <Route
           path="/instituicoes"
           element={
-            <RequireAuth>
-              <Layout>
-                <InstituicoesList />
-              </Layout>
-            </RequireAuth>
+            <ProtectedPage roles={['ADMIN']}>
+              <InstituicoesList />
+            </ProtectedPage>
           }
         />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

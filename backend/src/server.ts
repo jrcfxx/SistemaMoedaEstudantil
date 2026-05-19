@@ -8,7 +8,7 @@ import { vantagemRoutes } from './routes/vantagemRoutes';
 import { empresaParceiraRoutes } from './routes/empresaParceiraRoutes';
 import { instituicaoRoutes } from './routes/instituicaoRoutes';
 import { dashboardRoutes } from './routes/dashboardRoutes';
-import { errorHandler } from './middlewares/errorHandler';
+import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
 
 const app = express();
 const PORT = process.env.PORT || 3333;
@@ -34,6 +34,7 @@ app.use('/api/empresas-parceiras', empresaParceiraRoutes);
 app.use('/api/instituicoes', instituicaoRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
+app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.listen(PORT, () => {

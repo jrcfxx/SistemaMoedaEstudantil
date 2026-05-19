@@ -20,6 +20,12 @@ function gerarCodigoCupom(): string {
 }
 
 export const vantagemService = {
+  findAlunoByEmail: async (email: string) => {
+    const aluno = await prisma.aluno.findUnique({ where: { email } });
+    if (!aluno) throw new AppError('Cadastro de aluno não encontrado para este usuário', 404);
+    return aluno;
+  },
+
   findAll: async (search?: string) => {
     return vantagemRepository.findAll(search);
   },

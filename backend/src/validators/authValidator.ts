@@ -9,8 +9,17 @@ export const registerSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('E-mail inválido'),
   senha: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+  tipo: z.enum(['ALUNO', 'PROFESSOR', 'EMPRESA'], {
+    errorMap: () => ({ message: 'Tipo inválido. Use ALUNO, PROFESSOR ou EMPRESA' }),
+  }),
+});
+
+export const registerAdminSchema = z.object({
+  nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  email: z.string().email('E-mail inválido'),
+  senha: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
   tipo: z.enum(['ALUNO', 'PROFESSOR', 'EMPRESA', 'ADMIN'], {
-    errorMap: () => ({ message: 'Tipo inválido. Use ALUNO, PROFESSOR, EMPRESA ou ADMIN' }),
+    errorMap: () => ({ message: 'Tipo inválido' }),
   }),
 });
 

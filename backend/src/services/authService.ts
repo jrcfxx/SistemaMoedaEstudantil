@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../lib/prisma';
 import { AppError } from '../middlewares/errorHandler';
-import { LoginInput, RegisterInput } from '../validators/authValidator';
+import { LoginInput, RegisterInput, registerAdminSchema } from '../validators/authValidator';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'moeda_estudantil_secret_dev';
 const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn']) || '7d';
@@ -49,6 +49,16 @@ export const authService = {
     };
   },
 
+  registerAdmin: async (data: unknown): Promise<AuthResponse> => {
+    const { nome, email, senha, tipo } = registerAdminSchema.parse(data);
+    const existing = await prisma.usuario.findUnique({ where: { email } });
+    if (existing) throw new AppError('E-mail já cadastrado', 409);
+    const senhaHash = await bcrypt.hash(senha, 10);
+    const usuario = await prisma.usuario.create({ data: { nome, email, senhaHash, tipo } });
+    const token = gerarToken(usuario);
+    return { token, usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, tipo: usuario.tipo } };
+  },
+
   register: async ({ nome, email, senha, tipo }: RegisterInput): Promise<AuthResponse> => {
     const existing = await prisma.usuario.findUnique({ where: { email } });
     if (existing) throw new AppError('E-mail já cadastrado', 409);
@@ -71,7 +81,17 @@ export const authService = {
       select: { id: true, nome: true, email: true, tipo: true, createdAt: true },
     });
     if (!usuario) throw new AppError('Usuário não encontrado', 404);
-    return usuario;
+
+    const [aluno, empresa] = await Promise.all([
+      prisma.aluno.findFirst({ where: { email: usuario.email }, select: { id: true } }),
+      prisma.empresaParceira.findFirst({ where: { email: usuario.email }, select: { id: true } }),
+    ]);
+
+    return {
+      ...usuario,
+      alunoId: aluno?.id ?? null,
+      empresaId: empresa?.id ?? null,
+    };
   },
 
   verificarToken: (token: string): JwtPayload => {

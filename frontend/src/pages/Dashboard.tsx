@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, Building2, School, Coins, Clock } from 'lucide-react';
+import { GraduationCap, Building2, School, Coins, Clock, BookOpen } from 'lucide-react';
 import { StatCard } from '../components/ui/StatCard';
 import { Spinner } from '../components/ui/Spinner';
 import { Badge } from '../components/ui/Badge';
@@ -52,11 +52,11 @@ export default function Dashboard() {
           description="alunos cadastrados"
         />
         <StatCard
-          title="Empresas Parceiras"
-          value={stats.totalEmpresas}
-          icon={Building2}
+          title="Professores"
+          value={stats.totalProfessores}
+          icon={BookOpen}
           color="blue"
-          description="empresas ativas"
+          description="professores ativos"
         />
         <StatCard
           title="Instituições"
@@ -67,10 +67,10 @@ export default function Dashboard() {
         />
         <StatCard
           title="Moedas Distribuídas"
-          value="—"
+          value={stats.totalMoedasDistribuidas}
           icon={Coins}
           color="gold"
-          description="Sprint 03"
+          description="moedas em circulação"
         />
       </div>
 

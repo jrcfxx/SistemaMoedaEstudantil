@@ -112,7 +112,7 @@ export interface CreateVantagemInput {
 }
 
 export interface ResgateInput {
-  alunoId: string;
+  alunoId?: string;
   vantagemId: string;
 }
 
@@ -133,6 +133,8 @@ export interface DashboardStats {
   totalAlunos: number;
   totalEmpresas: number;
   totalInstituicoes: number;
+  totalProfessores: number;
+  totalMoedasDistribuidas: number;
   recentAlunos: Aluno[];
   recentEmpresas: EmpresaParceira[];
 }
