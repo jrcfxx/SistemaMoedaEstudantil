@@ -5,10 +5,10 @@ import Dashboard from './pages/Dashboard';
 import AlunosList from './pages/alunos/AlunosList';
 import EmpresasList from './pages/empresas/EmpresasList';
 import InstituicoesList from './pages/instituicoes/InstituicoesList';
+import { authService } from './services/authService';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  return isLoggedIn ? <>{children}</> : <Navigate to="/login" replace />;
+  return authService.isAuthenticated() ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
 export default function App() {

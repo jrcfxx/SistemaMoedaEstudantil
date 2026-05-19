@@ -8,6 +8,7 @@ import {
   Coins,
   LogOut,
 } from 'lucide-react';
+import { authService } from '../../services/authService';
 
 interface NavItem {
   to: string;
@@ -84,7 +85,7 @@ export function Sidebar() {
       <div className="px-3 py-4 border-t border-indigo-800">
         <button
           onClick={() => {
-            localStorage.removeItem('isLoggedIn');
+            authService.logout();
             window.location.href = '/login';
           }}
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-sidebar-text hover:bg-sidebar-hover hover:text-white transition-colors w-full"

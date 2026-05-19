@@ -1,6 +1,7 @@
 import { useState, FormEvent, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { authService } from '../services/authService';
 
 const ModelViewer = lazy(() => import('../components/ui/ModelViewer'));
 
@@ -20,10 +21,14 @@ export default function Login() {
     }
     setLoading(true);
     setError('');
-    await new Promise((r) => setTimeout(r, 800));
-    localStorage.setItem('isLoggedIn', 'true');
-    navigate('/dashboard');
-    setLoading(false);
+    try {
+      await authService.login(email, password);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao fazer login.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import { authRoutes } from './routes/authRoutes';
 import { alunoRoutes } from './routes/alunoRoutes';
 import { empresaParceiraRoutes } from './routes/empresaParceiraRoutes';
 import { instituicaoRoutes } from './routes/instituicaoRoutes';
@@ -23,6 +24,7 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/alunos', alunoRoutes);
 app.use('/api/empresas-parceiras', empresaParceiraRoutes);
 app.use('/api/instituicoes', instituicaoRoutes);
