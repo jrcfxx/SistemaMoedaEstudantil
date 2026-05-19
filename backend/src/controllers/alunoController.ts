@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { alunoService } from '../services/alunoService';
 
+type IdParam = { id: string };
+
 export const alunoController = {
-  findAll: async (req: Request, res: Response, next: NextFunction) => {
+  findAll: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const search = req.query.search as string | undefined;
       const alunos = await alunoService.findAll(search);
@@ -12,7 +14,7 @@ export const alunoController = {
     }
   },
 
-  findById: async (req: Request, res: Response, next: NextFunction) => {
+  findById: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
       const aluno = await alunoService.findById(req.params.id);
       res.json(aluno);
@@ -21,7 +23,7 @@ export const alunoController = {
     }
   },
 
-  create: async (req: Request, res: Response, next: NextFunction) => {
+  create: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const aluno = await alunoService.create(req.body);
       res.status(201).json(aluno);
@@ -30,7 +32,7 @@ export const alunoController = {
     }
   },
 
-  update: async (req: Request, res: Response, next: NextFunction) => {
+  update: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
       const aluno = await alunoService.update(req.params.id, req.body);
       res.json(aluno);
@@ -39,7 +41,7 @@ export const alunoController = {
     }
   },
 
-  delete: async (req: Request, res: Response, next: NextFunction) => {
+  delete: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
       await alunoService.delete(req.params.id);
       res.status(204).send();

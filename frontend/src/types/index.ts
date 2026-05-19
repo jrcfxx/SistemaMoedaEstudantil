@@ -20,6 +20,44 @@ export interface Aluno {
   updatedAt: string;
 }
 
+export interface Professor {
+  id: string;
+  nome: string;
+  cpf: string;
+  departamento: string;
+  saldoMoedas: number;
+  instituicaoId: string;
+  instituicao?: Pick<Instituicao, 'id' | 'nome'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TransacaoMoeda {
+  id: string;
+  tipo: 'ENVIO' | 'RECEBIMENTO' | 'RESGATE';
+  valor: number;
+  motivo: string;
+  alunoId: string;
+  professorId?: string;
+  vantagemId?: string;
+  createdAt: string;
+  aluno?: Pick<Aluno, 'id' | 'nome' | 'email'>;
+  professor?: Pick<Professor, 'id' | 'nome'>;
+}
+
+export interface CreateProfessorInput {
+  nome: string;
+  cpf: string;
+  departamento: string;
+  instituicaoId: string;
+}
+
+export interface DistribuirMoedasInput {
+  alunoId: string;
+  valor: number;
+  motivo: string;
+}
+
 export interface EmpresaParceira {
   id: string;
   nome: string;

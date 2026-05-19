@@ -19,7 +19,7 @@
 ## 🚧 Status do Projeto
 
 ![Versão](https://img.shields.io/badge/Versão-Release%201-blue?style=for-the-badge)
-![Sprint](https://img.shields.io/badge/Sprint%20Atual-Lab03S02-6d28d9?style=for-the-badge)
+![Sprint](https://img.shields.io/badge/Sprint%20Atual-Lab03S03-6d28d9?style=for-the-badge)
 ![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express%20%2B%20Prisma-339933?style=for-the-badge)
 ![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite%20%2B%20Tailwind-61DAFB?style=for-the-badge)
 ![DB](https://img.shields.io/badge/Banco-PostgreSQL%2016-4169E1?style=for-the-badge)
@@ -63,11 +63,12 @@ O **Sistema de Moeda Estudantil** é uma aplicação web Full-Stack projetada pa
 - 👤 **Gestão de Alunos (CRUD):** Cadastro com nome, e-mail, CPF, RG, endereço, instituição e curso.
 - 🏢 **Gestão de Empresas Parceiras (CRUD):** Empresas se cadastram e oferecem vantagens com descrição, foto e custo em moedas.
 - 🏫 **Gestão de Instituições:** Instituições pré-cadastradas para vinculação de alunos e professores.
-- 💰 **Distribuição de Moedas:** Professor envia moedas a um aluno com motivo obrigatório *(Sprint 03)*.
-- 🎁 **Resgate de Vantagens:** Aluno seleciona uma vantagem, tem o saldo descontado e recebe cupom *(Sprint 03)*.
-- 📋 **Extrato de Conta:** Alunos e professores consultam histórico completo de transações *(Sprint 03)*.
-- 📧 **Notificações por E-mail:** Envio automático ao receber moedas e ao resgatar vantagens *(Sprint 03)*.
-- 🔒 **Autenticação JWT:** Login seguro para alunos, professores e empresas *(Sprint 03)*.
+- 🔒 **Autenticação JWT:** Login seguro com token JWT, middleware de autenticação e autorização por papel (ALUNO, PROFESSOR, EMPRESA, ADMIN).
+- 👨‍🏫 **Módulo de Professor:** Cadastro, edição, consulta e distribuição de moedas com validação de saldo em tempo real e registro atômico de transações.
+- 💰 **Distribuição de Moedas:** Professor envia moedas a um aluno com motivo obrigatório; transação atômica garante consistência do saldo.
+- 🎁 **Resgate de Vantagens:** Aluno seleciona uma vantagem, tem o saldo descontado e recebe cupom *(em desenvolvimento — Sprint 03)*.
+- 📋 **Extrato de Conta:** Alunos e professores consultam histórico completo de transações *(em desenvolvimento — Sprint 03)*.
+- 📧 **Notificações por E-mail:** Envio automático ao receber moedas e ao resgatar vantagens *(em desenvolvimento — Sprint 03)*.
 
 ---
 
@@ -89,8 +90,8 @@ A stack foi escolhida com foco em TypeScript unificado em toda a aplicação e a
 | **HTTP client** | [Axios](https://axios-http.com/) | Interceptors e tratamento de erros centralizado |
 | **Roteamento** | [React Router v6](https://reactrouter.com/) | SPA com navegação sem reload |
 | **Ícones** | [Lucide React](https://lucide.dev/) | SVG tree-shakeable e moderno |
-| **Autenticação** | JWT *(Sprint 03)* | Autenticação stateless para API REST |
-| **E-mail** | Nodemailer *(Sprint 03)* | Notificações e cupons |
+| **Autenticação** | [JWT](https://jwt.io/) + [bcryptjs](https://github.com/dcodeIO/bcrypt.js) | Autenticação stateless; hash seguro de senhas |
+| **E-mail** | Nodemailer *(em desenvolvimento — Sprint 03)* | Notificações e cupons |
 | **Containerização** | [Docker](https://www.docker.com/) + [Docker Compose](https://docs.docker.com/compose/) | PostgreSQL local sem instalação manual |
 | **Controle de Versão** | [Git](https://git-scm.com/) + [GitHub](https://github.com/) | Versionamento e colaboração |
 
@@ -126,13 +127,18 @@ Aluno           → id, nome, email, cpf, rg, endereco, curso, saldoMoedas(=0), 
 EmpresaParceira → id, nome, email, cnpj, endereco, telefone?, status(ATIVA|INATIVA), usuarioId?
 ```
 
-### Entidades no schema — implementação Sprint Lab03S03
+### Entidades implementadas — Sprint Lab03S03
 
 ```
 Usuario        → id, nome, email, senhaHash, tipo(ALUNO|PROFESSOR|EMPRESA|ADMIN)
 Professor      → id, nome, cpf, departamento, saldoMoedas(=1000), instituicaoId, usuarioId?
-Vantagem       → id, titulo, descricao, fotoUrl?, custoMoedas, empresaParceiraId
 TransacaoMoeda → id, tipo(ENVIO|RECEBIMENTO|RESGATE), valor, motivo, alunoId, professorId?, vantagemId?
+```
+
+### Entidades no schema — em desenvolvimento
+
+```
+Vantagem       → id, titulo, descricao, fotoUrl?, custoMoedas, empresaParceiraId
 Resgate        → id, codigoCupom(único), status(PENDENTE|UTILIZADO), alunoId, vantagemId
 ```
 
@@ -172,8 +178,8 @@ Cada incremento representa uma entrega funcional ou artefato de projeto vinculad
 | 10 | CRUD de Aluno — front-end (React + integração com API) | Sprint 02 | ✅ Concluído |
 | 11 | CRUD de Empresa Parceira — front-end (React + integração com API) | Sprint 02 | ✅ Concluído |
 | 12 | CRUD de Instituição (back-end + front-end) + Dashboard | Sprint 02 | ✅ Concluído |
-| 13 | Autenticação e autorização (Spring Security + JWT) | Sprint 03 | ⏳ Pendente |
-| 14 | Módulo de Professor: distribuição de moedas com validação de saldo | Sprint 03 | ⏳ Pendente |
+| 13 | Autenticação e autorização (JWT + bcryptjs + middleware de roles) | Sprint 03 | ✅ Concluído |
+| 14 | Módulo de Professor: CRUD + distribuição de moedas com validação de saldo | Sprint 03 | ✅ Concluído |
 | 15 | Módulo de Aluno: resgate de vantagens + geração de cupom com código único | Sprint 03 | ⏳ Pendente |
 | 16 | Notificações por e-mail (recebimento de moedas e resgate de vantagem) | Sprint 03 | ⏳ Pendente |
 | 17 | Extrato de conta (professores e alunos) | Sprint 03 | ⏳ Pendente |
@@ -236,11 +242,19 @@ npm run dev
 
 O front-end estará em: **http://localhost:5173**
 
-### 5. Acesse o sistema
+### 5. Crie um usuário administrador
 
-Abra **[http://localhost:5173](http://localhost:5173)** e entre com qualquer e-mail e senha.
+Para acessar o sistema, cadastre um usuário via API ou use o endpoint de registro:
 
-> ⚠️ A autenticação real (JWT) será implementada na Sprint Lab03S03. Qualquer combinação de e-mail/senha válida concede acesso.
+```bash
+curl -X POST http://localhost:3333/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"nome":"Admin","email":"admin@pucminas.br","senha":"admin123","tipo":"ADMIN"}'
+```
+
+### 6. Acesse o sistema
+
+Abra **[http://localhost:5173](http://localhost:5173)** e entre com o e-mail e senha cadastrados.
 
 ---
 
@@ -248,47 +262,69 @@ Abra **[http://localhost:5173](http://localhost:5173)** e entre com qualquer e-m
 
 Base URL: `http://localhost:3333/api`
 
+> 🔒 Rotas marcadas com **[Auth]** exigem o header `Authorization: Bearer <token>`. Rotas marcadas com **[Role]** exigem papel específico.
+
 ### Health Check
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/health` | Verifica se a API está respondendo |
+| Método | Rota | Auth | Descrição |
+|---|---|:---:|---|
+| `GET` | `/health` | — | Verifica se a API está respondendo |
+
+### Autenticação
+
+| Método | Rota | Auth | Descrição |
+|---|---|:---:|---|
+| `POST` | `/auth/login` | — | Autentica usuário e retorna token JWT |
+| `POST` | `/auth/register` | — | Cadastra novo usuário |
+| `GET` | `/auth/me` | ✅ | Retorna dados do usuário autenticado |
 
 ### Alunos
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/alunos` | Lista todos (suporta `?search=`) |
-| `GET` | `/alunos/:id` | Busca por ID |
-| `POST` | `/alunos` | Cria novo aluno |
-| `PUT` | `/alunos/:id` | Atualiza aluno |
-| `DELETE` | `/alunos/:id` | Remove aluno |
+| Método | Rota | Auth | Role | Descrição |
+|---|---|:---:|:---:|---|
+| `GET` | `/alunos` | ✅ | — | Lista todos (suporta `?search=`) |
+| `GET` | `/alunos/:id` | ✅ | — | Busca por ID |
+| `POST` | `/alunos` | ✅ | ADMIN, PROFESSOR | Cria novo aluno |
+| `PUT` | `/alunos/:id` | ✅ | ADMIN, PROFESSOR | Atualiza aluno |
+| `DELETE` | `/alunos/:id` | ✅ | ADMIN | Remove aluno |
+
+### Professores
+
+| Método | Rota | Auth | Role | Descrição |
+|---|---|:---:|:---:|---|
+| `GET` | `/professores` | ✅ | — | Lista todos (suporta `?search=`) |
+| `GET` | `/professores/:id` | ✅ | — | Busca por ID |
+| `GET` | `/professores/:id/transacoes` | ✅ | — | Extrato de distribuições do professor |
+| `POST` | `/professores` | ✅ | ADMIN | Cria novo professor |
+| `PUT` | `/professores/:id` | ✅ | ADMIN, PROFESSOR | Atualiza professor |
+| `DELETE` | `/professores/:id` | ✅ | ADMIN | Remove professor |
+| `POST` | `/professores/:id/distribuir-moedas` | ✅ | ADMIN, PROFESSOR | Envia moedas a um aluno |
 
 ### Empresas Parceiras
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/empresas-parceiras` | Lista todas (suporta `?search=`) |
-| `GET` | `/empresas-parceiras/:id` | Busca por ID |
-| `POST` | `/empresas-parceiras` | Cria nova empresa |
-| `PUT` | `/empresas-parceiras/:id` | Atualiza empresa |
-| `DELETE` | `/empresas-parceiras/:id` | Remove empresa |
+| Método | Rota | Auth | Role | Descrição |
+|---|---|:---:|:---:|---|
+| `GET` | `/empresas-parceiras` | ✅ | — | Lista todas (suporta `?search=`) |
+| `GET` | `/empresas-parceiras/:id` | ✅ | — | Busca por ID |
+| `POST` | `/empresas-parceiras` | ✅ | ADMIN, EMPRESA | Cria nova empresa |
+| `PUT` | `/empresas-parceiras/:id` | ✅ | ADMIN, EMPRESA | Atualiza empresa |
+| `DELETE` | `/empresas-parceiras/:id` | ✅ | ADMIN | Remove empresa |
 
 ### Instituições
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/instituicoes` | Lista todas (suporta `?search=`) |
-| `GET` | `/instituicoes/:id` | Busca por ID |
-| `POST` | `/instituicoes` | Cria nova instituição |
-| `PUT` | `/instituicoes/:id` | Atualiza instituição |
-| `DELETE` | `/instituicoes/:id` | Remove instituição |
+| Método | Rota | Auth | Role | Descrição |
+|---|---|:---:|:---:|---|
+| `GET` | `/instituicoes` | ✅ | — | Lista todas (suporta `?search=`) |
+| `GET` | `/instituicoes/:id` | ✅ | — | Busca por ID |
+| `POST` | `/instituicoes` | ✅ | ADMIN | Cria nova instituição |
+| `PUT` | `/instituicoes/:id` | ✅ | ADMIN | Atualiza instituição |
+| `DELETE` | `/instituicoes/:id` | ✅ | ADMIN | Remove instituição |
 
 ### Dashboard
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/dashboard` | Totais + últimos 5 alunos e 5 empresas |
+| Método | Rota | Auth | Descrição |
+|---|---|:---:|---|
+| `GET` | `/dashboard` | ✅ | Totais + últimos 5 alunos e 5 empresas |
 
 ---
 
@@ -303,11 +339,31 @@ SistemaMoedaEstudantil/
 │   │   └── migrations/             ← Histórico de migrations
 │   ├── src/
 │   │   ├── controllers/            ← Camada MVC — recebem requisições HTTP
+│   │   │   ├── authController.ts
+│   │   │   ├── alunoController.ts
+│   │   │   ├── professorController.ts
+│   │   │   ├── empresaParceiraController.ts
+│   │   │   ├── instituicaoController.ts
+│   │   │   └── dashboardController.ts
 │   │   ├── services/               ← Regras de negócio e validações
+│   │   │   ├── authService.ts      ← JWT (geração, verificação)
+│   │   │   ├── alunoService.ts
+│   │   │   ├── professorService.ts ← Distribuição de moedas (transação atômica)
+│   │   │   ├── empresaParceiraService.ts
+│   │   │   ├── instituicaoService.ts
+│   │   │   └── dashboardService.ts
 │   │   ├── repositories/           ← Acesso ao banco via Prisma
 │   │   ├── routes/                 ← Definição das rotas Express
+│   │   │   ├── authRoutes.ts       ← /api/auth
+│   │   │   ├── alunoRoutes.ts
+│   │   │   ├── professorRoutes.ts  ← /api/professores + /distribuir-moedas
+│   │   │   ├── empresaParceiraRoutes.ts
+│   │   │   ├── instituicaoRoutes.ts
+│   │   │   └── dashboardRoutes.ts
 │   │   ├── validators/             ← Schemas Zod de validação
-│   │   ├── middlewares/            ← AppError + errorHandler global
+│   │   ├── middlewares/
+│   │   │   ├── authMiddleware.ts   ← authMiddleware + requireRole
+│   │   │   └── errorHandler.ts     ← AppError + handler global
 │   │   ├── lib/
 │   │   │   └── prisma.ts           ← Singleton do PrismaClient
 │   │   └── server.ts               ← Entry point da aplicação
@@ -324,9 +380,12 @@ SistemaMoedaEstudantil/
 │   │   │   ├── Login.tsx
 │   │   │   ├── Dashboard.tsx
 │   │   │   ├── alunos/             ← AlunosList + AlunoForm
+│   │   │   ├── professores/        ← ProfessoresList + ProfessorForm + DistribuirMoedasModal
 │   │   │   ├── empresas/           ← EmpresasList + EmpresaForm
 │   │   │   └── instituicoes/       ← InstituicoesList
 │   │   ├── services/               ← Chamadas HTTP via Axios
+│   │   │   ├── authService.ts      ← Login, logout, token, isAuthenticated
+│   │   │   ├── professorService.ts ← CRUD + distribuirMoedas
 │   │   ├── types/index.ts          ← Tipagens TypeScript
 │   │   ├── App.tsx                 ← Rotas React Router
 │   │   └── main.tsx
@@ -356,7 +415,7 @@ SistemaMoedaEstudantil/
 | ID | História do Usuário | Critérios de Aceitação | Status |
 |---|---|---|:---:|
 | HU01 | Como aluno, quero me cadastrar no sistema para participar do programa de moeda estudantil. | Informar nome, e-mail, CPF, RG, endereço, instituição e curso. | ✅ Sprint 02 |
-| HU02 | Como aluno, quero fazer login para acessar minhas funcionalidades com segurança. | O sistema deve validar e-mail e senha antes de liberar acesso. | 🔄 Sprint 03 |
+| HU02 | Como aluno, quero fazer login para acessar minhas funcionalidades com segurança. | O sistema deve validar e-mail e senha antes de liberar acesso. | ✅ Sprint 03 |
 | HU03 | Como aluno, quero consultar meu saldo para saber quantas moedas possuo. | O sistema deve exibir o saldo atualizado. | ⏳ Sprint 03 |
 | HU04 | Como aluno, quero consultar meu extrato para acompanhar moedas recebidas e vantagens resgatadas. | O extrato deve listar data, tipo da transação, valor e descrição. | ⏳ Sprint 03 |
 | HU05 | Como aluno, quero visualizar vantagens disponíveis para escolher onde gastar minhas moedas. | O sistema deve listar vantagens com descrição, foto, empresa e custo em moedas. | ⏳ Sprint 03 |
@@ -367,10 +426,10 @@ SistemaMoedaEstudantil/
 
 | ID | História do Usuário | Critérios de Aceitação | Status |
 |---|---|---|:---:|
-| HU08 | Como professor, quero fazer login para acessar minha conta no sistema. | O sistema deve autenticar professor pré-cadastrado. | 🔄 Sprint 03 |
-| HU09 | Como professor, quero receber 1.000 moedas por semestre para distribuir aos alunos. | O saldo semestral deve ser acumulado ao saldo existente. | ⏳ Sprint 03 |
-| HU10 | Como professor, quero enviar moedas a um aluno para reconhecer seu mérito. | Deve selecionar aluno, informar quantidade e motivo obrigatório. | ⏳ Sprint 03 |
-| HU11 | Como professor, quero que o sistema valide meu saldo antes do envio. | A transação só deve ocorrer se houver saldo suficiente. | ⏳ Sprint 03 |
+| HU08 | Como professor, quero fazer login para acessar minha conta no sistema. | O sistema deve autenticar professor pré-cadastrado. | ✅ Sprint 03 |
+| HU09 | Como professor, quero receber 1.000 moedas por semestre para distribuir aos alunos. | O saldo semestral deve ser acumulado ao saldo existente. | ✅ Sprint 03 |
+| HU10 | Como professor, quero enviar moedas a um aluno para reconhecer seu mérito. | Deve selecionar aluno, informar quantidade e motivo obrigatório. | ✅ Sprint 03 |
+| HU11 | Como professor, quero que o sistema valide meu saldo antes do envio. | A transação só deve ocorrer se houver saldo suficiente. | ✅ Sprint 03 |
 | HU12 | Como professor, quero consultar meu extrato para ver as moedas que distribuí. | O extrato deve mostrar envios realizados, alunos, valores, datas e motivos. | ⏳ Sprint 03 |
 
 ### Empresa Parceira
@@ -386,7 +445,7 @@ SistemaMoedaEstudantil/
 | ID | História do Usuário | Critérios de Aceitação | Status |
 |---|---|---|:---:|
 | HU16 | Como administrador, quero manter instituições pré-cadastradas para vincular alunos e professores. | O aluno deve selecionar uma instituição existente. | ✅ Sprint 02 |
-| HU17 | Como administrador, quero manter professores pré-cadastrados representando os docentes das instituições. | Cada professor deve possuir nome, CPF, departamento e instituição. | ⏳ Sprint 03 |
+| HU17 | Como administrador, quero manter professores pré-cadastrados representando os docentes das instituições. | Cada professor deve possuir nome, CPF, departamento e instituição. | ✅ Sprint 03 |
 | HU18 | Como sistema, quero enviar notificações por e-mail em eventos importantes. | O envio deve ocorrer ao receber moedas e ao resgatar vantagens. | ⏳ Sprint 03 |
 
 ---

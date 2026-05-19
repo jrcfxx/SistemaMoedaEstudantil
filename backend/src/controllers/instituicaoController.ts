@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { instituicaoService } from '../services/instituicaoService';
 
+type IdParam = { id: string };
+
 export const instituicaoController = {
-  findAll: async (req: Request, res: Response, next: NextFunction) => {
+  findAll: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const search = req.query.search as string | undefined;
       const instituicoes = await instituicaoService.findAll(search);
@@ -12,7 +14,7 @@ export const instituicaoController = {
     }
   },
 
-  findById: async (req: Request, res: Response, next: NextFunction) => {
+  findById: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
       const inst = await instituicaoService.findById(req.params.id);
       res.json(inst);
@@ -21,7 +23,7 @@ export const instituicaoController = {
     }
   },
 
-  create: async (req: Request, res: Response, next: NextFunction) => {
+  create: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const inst = await instituicaoService.create(req.body);
       res.status(201).json(inst);
@@ -30,7 +32,7 @@ export const instituicaoController = {
     }
   },
 
-  update: async (req: Request, res: Response, next: NextFunction) => {
+  update: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
       const inst = await instituicaoService.update(req.params.id, req.body);
       res.json(inst);
@@ -39,7 +41,7 @@ export const instituicaoController = {
     }
   },
 
-  delete: async (req: Request, res: Response, next: NextFunction) => {
+  delete: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
       await instituicaoService.delete(req.params.id);
       res.status(204).send();

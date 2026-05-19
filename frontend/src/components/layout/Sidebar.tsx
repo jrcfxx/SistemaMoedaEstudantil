@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
   GraduationCap,
+  BookOpen,
   Building2,
   School,
   Settings,
@@ -19,6 +20,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/alunos', label: 'Alunos', icon: GraduationCap },
+  { to: '/professores', label: 'Professores', icon: BookOpen },
   { to: '/empresas', label: 'Empresas Parceiras', icon: Building2 },
   { to: '/instituicoes', label: 'Instituições', icon: School },
 ];
@@ -93,7 +95,7 @@ export function Sidebar() {
           <LogOut className="w-5 h-5 flex-shrink-0" />
           Sair
         </button>
-        <p className="text-indigo-500 text-xs text-center mt-3">Sprint Lab03S02 · PUC Minas</p>
+        <p className="text-indigo-500 text-xs text-center mt-3">Sprint Lab03S03 · PUC Minas</p>
       </div>
     </aside>
   );
