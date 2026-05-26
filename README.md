@@ -18,8 +18,8 @@
 
 ## 🚧 Status do Projeto
 
-![Versão](https://img.shields.io/badge/Versão-Release%201-blue?style=for-the-badge)
-![Sprint](https://img.shields.io/badge/Sprint%20Atual-Lab03S03-6d28d9?style=for-the-badge)
+![Versão](https://img.shields.io/badge/Versão-Release%202-blue?style=for-the-badge)
+![Sprint](https://img.shields.io/badge/Laboratório-Lab04%20(Moeda%20Estudantil)-6d28d9?style=for-the-badge)
 ![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express%20%2B%20Prisma-339933?style=for-the-badge)
 ![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite%20%2B%20Tailwind-61DAFB?style=for-the-badge)
 ![DB](https://img.shields.io/badge/Banco-PostgreSQL%2016-4169E1?style=for-the-badge)
@@ -34,7 +34,7 @@
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [Arquitetura](#-arquitetura)
 - [Modelo de Dados](#-modelo-de-dados)
-- [Incrementos de Desenvolvimento](#-incrementos-de-desenvolvimento)
+- [Incrementos de Desenvolvimento](#-incrementos-de-desenvolvimento) (inclui Release 2 — Lab 04)
 - [Instalação e Execução](#-instalação-e-execução)
 - [Rotas da API](#-rotas-da-api)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
@@ -54,7 +54,7 @@ O **Sistema de Moeda Estudantil** é uma aplicação web Full-Stack projetada pa
 
 - **Por que ele existe:** Surgiu da necessidade de criar um canal formal e rastreável para que professores reconheçam bons comportamentos e desempenhos de alunos, substituindo elogios informais por um sistema de recompensas concreto e mensurável.
 - **Qual problema ele resolve:** Centraliza a distribuição e o resgate de moedas estudantis, garantindo reconhecimento de mérito, transparência financeira e um ecossistema de vantagens para alunos.
-- **Contexto:** Desenvolvido na disciplina de Laboratório de Desenvolvimento de Software da PUC Minas, aplicando boas práticas de Engenharia de Software com arquitetura **MVC**, desenvolvimento **Full-Stack** e modelagem **UML** completa.
+- **Contexto:** Desenvolvido na disciplina de Laboratório de Desenvolvimento de Software da PUC Minas, aplicando boas práticas de Engenharia de Software com arquitetura **MVC**, desenvolvimento **Full-Stack** e modelagem **UML** completa. O roteiro segue a **Release 1 (Lab 03)** e a **Release 2 (Lab 04)** descritas no material da disciplina.
 
 ---
 
@@ -68,7 +68,7 @@ O **Sistema de Moeda Estudantil** é uma aplicação web Full-Stack projetada pa
 - 💰 **Distribuição de Moedas:** Professor envia moedas a um aluno com motivo obrigatório; transação atômica garante consistência do saldo.
 - 🎁 **Resgate de Vantagens:** Aluno seleciona uma vantagem, tem o saldo descontado e recebe cupom único gerado automaticamente.
 - 📋 **Extrato de Conta:** Alunos e professores consultam histórico completo de transações, com resumo de saldo e cupons resgatados.
-- 📧 **Notificações por E-mail:** Envio automático via RabbitMQ (fila assíncrona) ao receber moedas e ao resgatar vantagens.
+- 📧 **Notificações por E-mail:** Envio automático via RabbitMQ ao receber moedas (template aluno), confirmar envio (template professor) e ao resgatar vantagens.
 - 🐰 **RabbitMQ:** Broker de mensagens para processamento assíncrono de notificações por e-mail.
 
 ---
@@ -133,19 +133,20 @@ Aluno           → id, nome, email, cpf, rg, endereco, curso, saldoMoedas(=0), 
 EmpresaParceira → id, nome, email, cnpj, endereco, telefone?, status(ATIVA|INATIVA), usuarioId?
 ```
 
-### Entidades implementadas — Sprint Lab03S03
+### Entidades implementadas — Sprint Lab03S03 / Lab04
 
 ```
 Usuario        → id, nome, email, senhaHash, tipo(ALUNO|PROFESSOR|EMPRESA|ADMIN)
 Professor      → id, nome, cpf, departamento, saldoMoedas(=1000), instituicaoId, usuarioId?
-TransacaoMoeda → id, tipo(ENVIO|RECEBIMENTO|RESGATE), valor, motivo, alunoId, professorId?, vantagemId?
+TransacaoMoeda → id, tipo(ENVIO|RESGATE), valor, motivo, alunoId, professorId?, vantagemId?
+Vantagem       → id, titulo, descricao, fotoUrl?, custoMoedas, empresaParceiraId
+Resgate        → id, codigoCupom(único), status(PENDENTE|UTILIZADO), alunoId, vantagemId
 ```
 
 ### Entidades no schema — em desenvolvimento
 
 ```
-Vantagem       → id, titulo, descricao, fotoUrl?, custoMoedas, empresaParceiraId
-Resgate        → id, codigoCupom(único), status(PENDENTE|UTILIZADO), alunoId, vantagemId
+(nenhuma pendente no schema principal)
 ```
 
 ### Relacionamentos
@@ -168,28 +169,41 @@ Vantagem         ──<  Resgate
 
 ## 📈 Incrementos de Desenvolvimento
 
-Cada incremento representa uma entrega funcional ou artefato de projeto vinculado a uma sprint, seguindo as entregas definidas no roteiro do laboratório.
+Cada incremento representa uma entrega funcional ou artefato de projeto vinculado a uma sprint, seguindo o roteiro do laboratório (**Release 1 — Lab 03** e **Release 2 — Lab 04**).
+
+### Release 1 (Laboratório 03)
 
 | # | Incremento | Sprint | Status |
 |:-:|---|:---:|:---:|
-| 1 | Diagrama de Casos de Uso | Sprint 01 | ✅ Concluído |
-| 2 | Histórias do Usuário (HU01–HU18) | Sprint 01 | ✅ Concluído |
-| 3 | Diagrama de Classes | Sprint 01 | ✅ Concluído |
-| 4 | Diagrama de Componentes | Sprint 01 | 🔄 Em andamento |
-| 5 | Modelo ER — `prisma/schema.prisma` | Sprint 02 | ✅ Concluído |
-| 6 | Configuração do banco de dados (PostgreSQL + Docker) | Sprint 02 | ✅ Concluído |
-| 7 | Camada de persistência com Prisma ORM (schema + migrations) | Sprint 02 | ✅ Concluído |
-| 8 | CRUD de Aluno — back-end (API REST) | Sprint 02 | ✅ Concluído |
-| 9 | CRUD de Empresa Parceira — back-end (API REST) | Sprint 02 | ✅ Concluído |
-| 10 | CRUD de Aluno — front-end (React + integração com API) | Sprint 02 | ✅ Concluído |
-| 11 | CRUD de Empresa Parceira — front-end (React + integração com API) | Sprint 02 | ✅ Concluído |
-| 12 | CRUD de Instituição (back-end + front-end) + Dashboard | Sprint 02 | ✅ Concluído |
-| 13 | Autenticação e autorização (JWT + bcryptjs + middleware de roles) | Sprint 03 | ✅ Concluído |
-| 14 | Módulo de Professor: CRUD + distribuição de moedas com validação de saldo | Sprint 03 | ✅ Concluído |
-| 15 | Módulo de Aluno: resgate de vantagens + geração de cupom com código único | Sprint 03 | ✅ Concluído |
-| 16 | Notificações por e-mail (recebimento de moedas e resgate de vantagem) via RabbitMQ | Sprint 03 | ✅ Concluído |
-| 17 | Extrato de conta (professores e alunos) | Sprint 03 | ✅ Concluído |
-| 18 | Diagrama de Arquitetura + slides para apresentação final | Sprint 03 | ⏳ Pendente |
+| 1 | Diagrama de Casos de Uso | Lab03S01 | ✅ Concluído |
+| 2 | Histórias do Usuário (HU01–HU18) | Lab03S01 | ✅ Concluído |
+| 3 | Diagrama de Classes | Lab03S01 | ✅ Concluído |
+| 4 | Diagrama de Componentes | Lab03S01 | 🔄 Em andamento |
+| 5 | Modelo ER — `prisma/schema.prisma` | Lab03S02 | ✅ Concluído |
+| 6 | Configuração do banco de dados (PostgreSQL + Docker) | Lab03S02 | ✅ Concluído |
+| 7 | Camada de persistência com Prisma ORM (schema + migrations) | Lab03S02 | ✅ Concluído |
+| 8 | CRUD de Aluno — back-end (API REST) | Lab03S02 | ✅ Concluído |
+| 9 | CRUD de Empresa Parceira — back-end (API REST) | Lab03S02 | ✅ Concluído |
+| 10 | CRUD de Aluno — front-end (React + integração com API) | Lab03S02 | ✅ Concluído |
+| 11 | CRUD de Empresa Parceira — front-end (React + integração com API) | Lab03S02 | ✅ Concluído |
+| 12 | CRUD de Instituição (back-end + front-end) + Dashboard | Lab03S02 | ✅ Concluído |
+| 13 | CRUD de Aluno e Empresa — versão final + apresentação da arquitetura e persistência (slides) | Lab03S03 | ✅ Concluído |
+| 14 | Autenticação e autorização (JWT + bcryptjs + middleware de roles) | Lab03S03 | ✅ Concluído |
+| 15 | Módulo de Professor: CRUD + distribuição de moedas com validação de saldo | Lab03S03 | ✅ Concluído |
+| 16 | Módulo de Aluno: resgate de vantagens + geração de cupom com código único | Lab03S03 | ✅ Concluído |
+| 17 | Notificações por e-mail (recebimento de moedas e resgate de vantagem) via RabbitMQ | Lab03S03 | ✅ Concluído |
+| 18 | Extrato de conta (professores e alunos) | Lab03S03 | ✅ Concluído |
+| 19 | Diagrama de Arquitetura + slides para apresentação | Lab03S03 | ⏳ Pendente |
+
+### Release 2 — Entregáveis incrementais (Lab 04)
+
+Conforme **Laboratório 04 — Sistema de Moeda Estudantil (Release 2)**. Ao final da **Sprint 03** do Lab 04, o grupo apresenta o protótipo da Release 2, comparando com os modelos iniciais e as alterações feitas para atender à especificação; o repositório deve conter **versões atualizadas dos modelos UML** e o **código final**, em arquitetura **MVC**. A avaliação considera adequação aos requisitos, alinhamento entre modelo (classes e arquitetura) e código, e atualização dos modelos conforme a evolução do projeto.
+
+| # | Entregável incremental | Sprint | O que inclui (conforme enunciado) | Status |
+|:-:|---|:---:|---|:---:|
+| 20 | **Lab04S01** — Envio de moedas, extrato e e-mails | Lab04S01 | Casos de uso de **envio de moedas** e **consulta de extrato** (professor e aluno). **E-mail** confirmando envio (template professor) e recebimento (template aluno). *Opcional:* demonstração em **vídeo** se não for possível reproduzir o ambiente no laboratório. | ✅ Concluído |
+| 21 | **Lab04S02** — Diagramas de sequência, vantagens e listagem | Lab04S02 | **Diagramas de sequência** (um por caso de uso). Implementação: **cadastro de vantagens** (empresa parceira) e **listagem de vantagens** (aluno). | ⏳ Pendente |
+| 22 | **Lab04S03** — Diagrama de sequência geral e troca de vantagens | Lab04S03 | **Diagrama de sequência geral** e implementação do caso de uso de **troca de vantagens** (pelo aluno). | ⏳ Pendente |
 
 > **Legenda:** ✅ Concluído &nbsp;|&nbsp; 🔄 Em andamento &nbsp;|&nbsp; ⏳ Pendente
 
@@ -292,7 +306,10 @@ Base URL: `http://localhost:3333/api`
 | `GET` | `/alunos/:id` | ✅ | — | Busca por ID |
 | `POST` | `/alunos` | ✅ | ADMIN, PROFESSOR | Cria novo aluno |
 | `PUT` | `/alunos/:id` | ✅ | ADMIN, PROFESSOR | Atualiza aluno |
+| `GET` | `/alunos/:id/transacoes` | ✅ | ALUNO* | Extrato de transações do aluno |
 | `DELETE` | `/alunos/:id` | ✅ | ADMIN | Remove aluno |
+
+> \* Aluno acessa apenas o próprio extrato; admin acessa qualquer ID.
 
 ### Professores
 
@@ -300,11 +317,13 @@ Base URL: `http://localhost:3333/api`
 |---|---|:---:|:---:|---|
 | `GET` | `/professores` | ✅ | — | Lista todos (suporta `?search=`) |
 | `GET` | `/professores/:id` | ✅ | — | Busca por ID |
-| `GET` | `/professores/:id/transacoes` | ✅ | — | Extrato de distribuições do professor |
+| `GET` | `/professores/:id/transacoes` | ✅ | PROFESSOR* | Extrato de distribuições do professor |
 | `POST` | `/professores` | ✅ | ADMIN | Cria novo professor |
 | `PUT` | `/professores/:id` | ✅ | ADMIN, PROFESSOR | Atualiza professor |
 | `DELETE` | `/professores/:id` | ✅ | ADMIN | Remove professor |
 | `POST` | `/professores/:id/distribuir-moedas` | ✅ | ADMIN, PROFESSOR | Envia moedas a um aluno |
+
+> \* Professor acessa apenas o próprio extrato; admin acessa qualquer ID.
 
 ### Empresas Parceiras
 
@@ -325,6 +344,21 @@ Base URL: `http://localhost:3333/api`
 | `POST` | `/instituicoes` | ✅ | ADMIN | Cria nova instituição |
 | `PUT` | `/instituicoes/:id` | ✅ | ADMIN | Atualiza instituição |
 | `DELETE` | `/instituicoes/:id` | ✅ | ADMIN | Remove instituição |
+
+### Vantagens
+
+| Método | Rota | Auth | Role | Descrição |
+|---|---|:---:|:---:|---|
+| `GET` | `/vantagens` | ✅ | — | Lista catálogo (suporta `?search=`) |
+| `GET` | `/vantagens/:id` | ✅ | — | Busca por ID |
+| `GET` | `/vantagens/empresa/:empresaParceiraId` | ✅ | EMPRESA* | Vantagens de uma empresa (`?search=`) |
+| `POST` | `/vantagens` | ✅ | ADMIN, EMPRESA | Cadastra vantagem |
+| `PUT` | `/vantagens/:id` | ✅ | ADMIN, EMPRESA* | Atualiza vantagem |
+| `DELETE` | `/vantagens/:id` | ✅ | ADMIN, EMPRESA* | Remove vantagem |
+| `POST` | `/vantagens/resgatar` | ✅ | ALUNO | Resgata vantagem (gera cupom) |
+| `GET` | `/vantagens/resgates/aluno/:id` | ✅ | ADMIN, ALUNO* | Cupons do aluno |
+
+> \* Papel `EMPRESA`/`ALUNO` restrito aos próprios registros.
 
 ### Dashboard
 
@@ -452,7 +486,7 @@ SistemaMoedaEstudantil/
 |---|---|---|:---:|
 | HU16 | Como administrador, quero manter instituições pré-cadastradas para vincular alunos e professores. | O aluno deve selecionar uma instituição existente. | ✅ Sprint 02 |
 | HU17 | Como administrador, quero manter professores pré-cadastrados representando os docentes das instituições. | Cada professor deve possuir nome, CPF, departamento e instituição. | ✅ Sprint 03 |
-| HU18 | Como sistema, quero enviar notificações por e-mail em eventos importantes. | O envio deve ocorrer ao receber moedas e ao resgatar vantagens. | ✅ Sprint 03 |
+| HU18 | Como sistema, quero enviar notificações por e-mail em eventos importantes. | O envio deve ocorrer ao receber moedas (aluno), confirmar envio (professor) e ao resgatar vantagens. | ✅ Sprint 03 / Lab04S01 |
 
 ---
 
@@ -476,7 +510,13 @@ SistemaMoedaEstudantil/
 
 ### Diagrama de Arquitetura
 
-> Em elaboração — Sprint 03.
+> Em elaboração — Lab03S03 / Release 1.
+
+### Diagramas de sequência (Release 2 — Lab 04)
+
+> **Lab04S02:** um diagrama de sequência por caso de uso abrangido na sprint (ex.: cadastro de vantagens, listagem para o aluno).  
+> **Lab04S03:** diagrama de sequência **geral** do sistema ou do fluxo principal acordado com o docente.  
+> Sugestão de pasta: `docs/diagramas/sequencia/`.
 
 ---
 
@@ -484,6 +524,7 @@ SistemaMoedaEstudantil/
 
 - [**Laboratório de Desenvolvimento de Software — PUC Minas**](https://github.com/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software)
 - [**Template README — Prof. João Paulo Aramuni**](https://github.com/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software/blob/main/TEMPLATES/template_README.md)
+- [**Cronograma da disciplina**](https://github.com/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software/tree/main/CRONOGRAMA)
 - [**Conventional Commits**](https://www.conventionalcommits.org/en/v1.0.0/)
 - [**Node.js — Documentação Oficial**](https://nodejs.org/en/docs)
 - [**Express — Documentação Oficial**](https://expressjs.com/)

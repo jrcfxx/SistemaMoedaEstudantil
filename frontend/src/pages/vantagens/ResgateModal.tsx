@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { vantagemService } from '../../services/vantagemService';
 import { alunoService } from '../../services/alunoService';
 import { authService } from '../../services/authService';
+import { useSaldo } from '../../contexts/SaldoContext';
 import { api } from '../../services/api';
 import { Vantagem, Resgate } from '../../types';
 
@@ -17,6 +18,7 @@ interface ResgateModalProps {
 }
 
 export function ResgateModal({ open, vantagem, onClose }: ResgateModalProps) {
+  const { refreshSaldo } = useSaldo();
   const [etapa, setEtapa] = useState<Etapa>('confirmar');
   const [loading, setLoading] = useState(false);
   const [loadingSaldo, setLoadingSaldo] = useState(false);
@@ -69,12 +71,10 @@ export function ResgateModal({ open, vantagem, onClose }: ResgateModalProps) {
     setLoading(true);
     setError('');
     try {
-      const body = user?.tipo === 'ALUNO'
-        ? { vantagemId: vantagem.id }
-        : { alunoId: user?.alunoId, vantagemId: vantagem.id };
-      const result = await vantagemService.resgatar(body as { alunoId: string; vantagemId: string });
+      const result = await vantagemService.resgatar({ vantagemId: vantagem.id });
       setResgate(result.resgate);
       setSaldoRestante(result.saldoRestante);
+      await refreshSaldo();
       setEtapa('sucesso');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao resgatar vantagem');

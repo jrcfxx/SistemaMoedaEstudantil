@@ -25,6 +25,7 @@ export const professorController = {
 
   findTransacoes: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
+      await professorService.assertProfessorAutorizado(req.params.id, req.user);
       const data = await professorService.findTransacoes(req.params.id);
       res.json(data);
     } catch (err) {
@@ -43,7 +44,8 @@ export const professorController = {
 
   update: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const data = await professorService.update(req.params.id, req.body);
+      await professorService.assertProfessorAutorizado(req.params.id, req.user);
+      const data = await professorService.update(req.params.id, req.body, req.user);
       res.json(data);
     } catch (err) {
       next(err);
@@ -61,6 +63,7 @@ export const professorController = {
 
   distribuirMoedas: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
+      await professorService.assertProfessorAutorizado(req.params.id, req.user);
       const result = await professorService.distribuirMoedas(req.params.id, req.body);
       res.status(201).json(result);
     } catch (err) {

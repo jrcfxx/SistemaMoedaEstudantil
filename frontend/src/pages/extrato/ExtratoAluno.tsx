@@ -9,8 +9,12 @@ import { TransacaoMoeda, Resgate } from '../../types';
 
 const TIPO_CONFIG = {
   ENVIO: { label: 'Moedas recebidas', icon: ArrowDownCircle, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200', sinal: '+' },
-  RECEBIMENTO: { label: 'Recebimento', icon: ArrowDownCircle, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200', sinal: '+' },
   RESGATE: { label: 'Resgate de vantagem', icon: ShoppingBag, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200', sinal: '-' },
+} as const;
+
+const STATUS_CUPOM: Record<string, { label: string; className: string }> = {
+  PENDENTE: { label: 'Pendente', className: 'bg-green-100 text-green-700' },
+  UTILIZADO: { label: 'Utilizado', className: 'bg-slate-100 text-slate-500' },
 };
 
 function formatDate(iso: string) {
@@ -57,7 +61,7 @@ export default function ExtratoAluno() {
     );
   }
 
-  const totalRecebido = transacoes.filter(t => t.tipo !== 'RESGATE').reduce((s, t) => s + t.valor, 0);
+  const totalRecebido = transacoes.filter((t) => t.tipo === 'ENVIO').reduce((s, t) => s + t.valor, 0);
   const totalGasto = transacoes.filter(t => t.tipo === 'RESGATE').reduce((s, t) => s + t.valor, 0);
 
   return (
@@ -127,7 +131,7 @@ export default function ExtratoAluno() {
           ) : (
             <div className="divide-y divide-slate-100">
               {transacoes.map((t) => {
-                const cfg = TIPO_CONFIG[t.tipo] || TIPO_CONFIG.ENVIO;
+                const cfg = TIPO_CONFIG[t.tipo as keyof typeof TIPO_CONFIG] ?? TIPO_CONFIG.ENVIO;
                 const Icon = cfg.icon;
                 return (
                   <div key={t.id} className="flex items-center gap-4 px-5 py-4">
@@ -167,9 +171,9 @@ export default function ExtratoAluno() {
                   </div>
                   <div className="text-right flex-shrink-0">
                     <span
-                      className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5 ${r.status === 'UTILIZADO' ? 'bg-slate-100 text-slate-500' : 'bg-green-100 text-green-700'}`}
+                      className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5 ${STATUS_CUPOM[r.status]?.className ?? STATUS_CUPOM.PENDENTE.className}`}
                     >
-                      {r.status === 'UTILIZADO' ? 'Utilizado' : 'Ativo'}
+                      {STATUS_CUPOM[r.status]?.label ?? r.status}
                     </span>
                     <p className="font-mono text-sm font-bold text-indigo-700 tracking-wider">{r.codigoCupom}</p>
                     <p className="text-xs text-amber-600 mt-0.5">🪙 {r.vantagem?.custoMoedas}</p>

@@ -7,8 +7,8 @@ export const professorRoutes = Router();
 professorRoutes.use(authMiddleware);
 
 professorRoutes.get('/', professorController.findAll);
-professorRoutes.get('/:id', professorController.findById);
 professorRoutes.get('/:id/transacoes', professorController.findTransacoes);
+professorRoutes.get('/:id', professorController.findById);
 professorRoutes.post('/', requireRole('ADMIN'), professorController.create);
 professorRoutes.put('/:id', requireRole('ADMIN', 'PROFESSOR'), professorController.update);
 professorRoutes.delete('/:id', requireRole('ADMIN'), professorController.delete);

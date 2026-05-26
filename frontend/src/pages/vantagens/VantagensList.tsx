@@ -26,11 +26,17 @@ export default function VantagensList() {
   const user = authService.getUser();
   const podeGerir = user ? ROLES_GESTAO.includes(user.tipo) : false;
   const podeResgatar = user?.tipo === 'ALUNO';
+  const isEmpresa = user?.tipo === 'EMPRESA';
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await vantagemService.findAll(search || undefined);
+      let data: Vantagem[];
+      if (isEmpresa && user?.empresaId) {
+        data = await vantagemService.findByEmpresa(user.empresaId, search || undefined);
+      } else {
+        data = await vantagemService.findAll(search || undefined);
+      }
       setVantagens(data);
       setError('');
     } catch {
@@ -38,7 +44,7 @@ export default function VantagensList() {
     } finally {
       setLoading(false);
     }
-  }, [search]);
+  }, [search, isEmpresa, user?.empresaId]);
 
   useEffect(() => {
     const timer = setTimeout(load, 300);
@@ -60,9 +66,14 @@ export default function VantagensList() {
     }
   };
 
+  const emptyDescription = isEmpresa
+    ? 'Cadastre a primeira vantagem da sua empresa.'
+    : search
+      ? 'Tente outros termos de busca.'
+      : 'Nenhuma vantagem cadastrada ainda.';
+
   return (
     <div className="space-y-6">
-      {/* Barra de ações */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -70,7 +81,7 @@ export default function VantagensList() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por título, descrição ou empresa..."
+            placeholder={isEmpresa ? 'Buscar nas suas vantagens...' : 'Buscar por título, descrição ou empresa...'}
             className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
@@ -95,7 +106,7 @@ export default function VantagensList() {
           <EmptyState
             icon={Gift}
             title="Nenhuma vantagem encontrada"
-            description={search ? 'Tente outros termos de busca.' : 'Nenhuma vantagem cadastrada ainda.'}
+            description={emptyDescription}
             action={podeGerir && !search ? { label: 'Cadastrar vantagem', onClick: () => { setSelectedVantagem(undefined); setFormOpen(true); } } : undefined}
           />
         </div>
@@ -154,7 +165,6 @@ interface VantagemCardProps {
 function VantagemCard({ vantagem: v, podeResgatar, podeGerir, onResgatar, onEditar, onExcluir }: VantagemCardProps) {
   return (
     <div className="group bg-white rounded-2xl overflow-hidden border border-slate-200 hover:border-indigo-300 hover:shadow-lg transition-all duration-200 flex flex-col">
-      {/* Imagem */}
       <div className="relative h-44 bg-gradient-to-br from-indigo-50 via-purple-50 to-slate-100 overflow-hidden flex-shrink-0">
         {v.fotoUrl ? (
           <img
@@ -170,13 +180,11 @@ function VantagemCard({ vantagem: v, podeResgatar, podeGerir, onResgatar, onEdit
             <ShoppingBag className="w-14 h-14 text-indigo-200" />
           </div>
         )}
-        {/* Badge de preço flutuante */}
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm border border-amber-200 text-amber-700 font-bold text-sm px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
           🪙 {v.custoMoedas}
         </div>
-        {/* Botões de gestão (hover) */}
         {podeGerir && (
-          <div className="absolute top-3 left-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <div className="absolute top-3 left-3 flex gap-1.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
             <button
               title="Editar"
               onClick={onEditar}
@@ -195,7 +203,6 @@ function VantagemCard({ vantagem: v, podeResgatar, podeGerir, onResgatar, onEdit
         )}
       </div>
 
-      {/* Conteúdo */}
       <div className="p-4 flex flex-col flex-1 gap-2">
         <h3 className="font-semibold text-slate-800 text-sm leading-snug">{v.titulo}</h3>
         <p className="text-slate-500 text-xs leading-relaxed flex-1 line-clamp-2">{v.descricao}</p>

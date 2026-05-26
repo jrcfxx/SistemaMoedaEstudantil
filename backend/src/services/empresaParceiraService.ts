@@ -1,5 +1,6 @@
 import { empresaParceiraRepository } from '../repositories/empresaParceiraRepository';
 import { AppError } from '../middlewares/errorHandler';
+import { assertEmpresaAutorizada, RequestUser } from '../lib/authHelpers';
 import {
   CreateEmpresaParceiraInput,
   UpdateEmpresaParceiraInput,
@@ -35,7 +36,9 @@ export const empresaParceiraService = {
     return empresaParceiraRepository.create(parsed);
   },
 
-  update: async (id: string, data: UpdateEmpresaParceiraInput) => {
+  update: async (id: string, data: UpdateEmpresaParceiraInput, usuario?: RequestUser) => {
+    await assertEmpresaAutorizada(id, usuario);
+
     const parsed = updateEmpresaParceiraSchema.parse(data);
 
     const empresa = await empresaParceiraRepository.findById(id);

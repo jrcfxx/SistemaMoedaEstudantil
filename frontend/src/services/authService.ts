@@ -1,10 +1,12 @@
 import { api } from './api';
 
+export type TipoUsuario = 'ADMIN' | 'PROFESSOR' | 'ALUNO' | 'EMPRESA';
+
 export interface AuthUser {
   id: string;
   nome: string;
   email: string;
-  tipo: string;
+  tipo: TipoUsuario;
   alunoId?: string | null;
   empresaId?: string | null;
   professorId?: string | null;

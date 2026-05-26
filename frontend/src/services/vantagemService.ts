@@ -18,8 +18,9 @@ export const vantagemService = {
     return data;
   },
 
-  findByEmpresa: async (empresaId: string): Promise<Vantagem[]> => {
-    const { data } = await api.get<Vantagem[]>(`/vantagens/empresa/${empresaId}`);
+  findByEmpresa: async (empresaId: string, search?: string): Promise<Vantagem[]> => {
+    const params = search ? { search } : {};
+    const { data } = await api.get<Vantagem[]>(`/vantagens/empresa/${empresaId}`, { params });
     return data;
   },
 
@@ -41,7 +42,6 @@ export const vantagemService = {
     const { data } = await api.post<ResgateResponse>('/vantagens/resgatar', input);
     return data;
   },
-
 
   findResgatesByAluno: async (alunoId: string): Promise<Resgate[]> => {
     const { data } = await api.get<Resgate[]>(`/vantagens/resgates/aluno/${alunoId}`);

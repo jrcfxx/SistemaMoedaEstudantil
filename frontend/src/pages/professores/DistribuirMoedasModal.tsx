@@ -8,6 +8,7 @@ import { Select } from '../../components/ui/Select';
 import { Button } from '../../components/ui/Button';
 import { professorService } from '../../services/professorService';
 import { alunoService } from '../../services/alunoService';
+import { useSaldo } from '../../contexts/SaldoContext';
 import { Professor, Aluno } from '../../types';
 
 const schema = z.object({
@@ -39,6 +40,7 @@ export function DistribuirMoedasModal({
   onClose,
   onSuccess,
 }: DistribuirMoedasModalProps) {
+  const { refreshSaldo } = useSaldo();
   const [loading, setLoading] = useState(false);
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [error, setError] = useState('');
@@ -81,7 +83,9 @@ export function DistribuirMoedasModal({
     try {
       const result = await professorService.distribuirMoedas(professor.id, data);
       const alunoNome = alunos.find((a) => a.id === data.alunoId)?.nome ?? 'aluno';
-      setSucesso(`${data.valor} moeda(s) enviada(s) para ${alunoNome} com sucesso!`);
+      setSaldoAtual(result.saldoProfessor);
+      setSucesso(`${data.valor} moeda(s) enviada(s) para ${alunoNome} com sucesso.`);
+      await refreshSaldo();
       reset({ alunoId: '', valor: undefined, motivo: '' });
       onSuccess?.();
     } catch (err) {

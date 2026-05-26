@@ -7,8 +7,8 @@ export const vantagemRoutes = Router();
 vantagemRoutes.use(authMiddleware);
 
 // Rotas estáticas SEMPRE antes de /:id para evitar conflito de roteamento
-vantagemRoutes.post('/resgatar', requireRole('ADMIN', 'ALUNO'), vantagemController.resgatar);
-vantagemRoutes.get('/resgates/aluno/:id', vantagemController.findResgatesByAluno);
+vantagemRoutes.post('/resgatar', requireRole('ALUNO'), vantagemController.resgatar);
+vantagemRoutes.get('/resgates/aluno/:id', requireRole('ADMIN', 'ALUNO'), vantagemController.findResgatesByAluno);
 vantagemRoutes.get('/empresa/:empresaParceiraId', vantagemController.findByEmpresa);
 
 vantagemRoutes.get('/', vantagemController.findAll);

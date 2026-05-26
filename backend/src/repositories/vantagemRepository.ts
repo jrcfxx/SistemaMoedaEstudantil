@@ -2,7 +2,7 @@ import { prisma } from '../lib/prisma';
 import { CreateVantagemInput, UpdateVantagemInput } from '../validators/vantagemValidator';
 
 const includeEmpresa = {
-  empresa: { select: { id: true, nome: true, email: true } },
+  empresa: { select: { id: true, nome: true, email: true, status: true } },
 } as const;
 
 export const vantagemRepository = {
@@ -26,9 +26,19 @@ export const vantagemRepository = {
     return prisma.vantagem.findUnique({ where: { id }, include: includeEmpresa });
   },
 
-  findByEmpresa: (empresaParceiraId: string) => {
+  findByEmpresa: (empresaParceiraId: string, search?: string) => {
     return prisma.vantagem.findMany({
-      where: { empresaParceiraId },
+      where: {
+        empresaParceiraId,
+        ...(search
+          ? {
+              OR: [
+                { titulo: { contains: search, mode: 'insensitive' } },
+                { descricao: { contains: search, mode: 'insensitive' } },
+              ],
+            }
+          : {}),
+      },
       include: includeEmpresa,
       orderBy: { createdAt: 'desc' },
     });

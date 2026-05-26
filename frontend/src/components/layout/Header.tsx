@@ -1,9 +1,7 @@
 import { User } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import { authService } from '../../services/authService';
-import { alunoService } from '../../services/alunoService';
-import { professorService } from '../../services/professorService';
+import { useSaldo } from '../../contexts/SaldoContext';
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'Administrador',
@@ -12,46 +10,64 @@ const ROLE_LABELS: Record<string, string> = {
   EMPRESA: 'Empresa Parceira',
 };
 
-const pageTitles: Record<string, { title: string; subtitle: string }> = {
-  '/dashboard': { title: 'Dashboard', subtitle: 'Visão geral do sistema' },
-  '/alunos': { title: 'Alunos', subtitle: 'Gerenciamento de alunos cadastrados' },
-  '/professores': { title: 'Professores', subtitle: 'Gerenciamento de professores' },
-  '/empresas': { title: 'Empresas Parceiras', subtitle: 'Gerenciamento de empresas parceiras' },
-  '/instituicoes': { title: 'Instituições', subtitle: 'Gerenciamento de instituições de ensino' },
-  '/vantagens': { title: 'Vantagens', subtitle: 'Catálogo de vantagens disponíveis' },
-  '/extrato': { title: 'Meu Extrato', subtitle: 'Histórico de transações e cupons' },
-  '/extrato-professor': { title: 'Meu Extrato', subtitle: 'Histórico de moedas distribuídas' },
-  '/configuracoes': { title: 'Configurações', subtitle: 'Configurações do sistema' },
+function subtitleFor(pathname: string, tipo?: string): string {
+  if (pathname === '/vantagens') {
+    const map: Record<string, string> = {
+      ALUNO: 'Catálogo de vantagens disponíveis para resgate',
+      EMPRESA: 'Gerencie as vantagens oferecidas pela sua empresa',
+      ADMIN: 'Gerenciamento do catálogo de vantagens',
+      PROFESSOR: 'Vantagens disponíveis no sistema',
+    };
+    return map[tipo ?? ''] ?? 'Catálogo de vantagens disponíveis';
+  }
+
+  if (pathname === '/dashboard') {
+    const map: Record<string, string> = {
+      ADMIN: 'Visão geral do sistema',
+      ALUNO: 'Bem-vindo ao programa de moeda estudantil',
+      PROFESSOR: 'Distribua moedas e acompanhe seu extrato',
+      EMPRESA: 'Gerencie as vantagens da sua empresa',
+    };
+    return map[tipo ?? ''] ?? 'Visão geral do sistema';
+  }
+
+  const defaults: Record<string, string> = {
+    '/alunos': 'Gerenciamento de alunos cadastrados',
+    '/professores': 'Gerenciamento de professores',
+    '/empresas': 'Gerenciamento de empresas parceiras',
+    '/instituicoes': 'Gerenciamento de instituições de ensino',
+    '/extrato': 'Histórico de transações e cupons',
+    '/extrato-professor': 'Histórico de moedas distribuídas',
+  };
+
+  return defaults[pathname] ?? '';
+}
+
+const pageTitles: Record<string, string> = {
+  '/dashboard': 'Dashboard',
+  '/alunos': 'Alunos',
+  '/professores': 'Professores',
+  '/empresas': 'Empresas Parceiras',
+  '/instituicoes': 'Instituições',
+  '/vantagens': 'Vantagens',
+  '/extrato': 'Meu Extrato',
+  '/extrato-professor': 'Meu Extrato',
 };
 
 export function Header() {
   const { pathname } = useLocation();
   const user = authService.getUser();
-  const page = pageTitles[pathname] ?? { title: 'Moeda Estudantil', subtitle: '' };
+  const { saldo } = useSaldo();
 
-  const [saldo, setSaldo] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (user?.tipo === 'ALUNO' && user.alunoId) {
-      alunoService.findById(user.alunoId)
-        .then((a) => setSaldo(a.saldoMoedas))
-        .catch(() => {});
-    } else if (user?.tipo === 'PROFESSOR' && user.professorId) {
-      professorService.findById(user.professorId)
-        .then((p) => setSaldo(p.saldoMoedas))
-        .catch(() => {});
-    } else {
-      setSaldo(null);
-    }
-  }, [pathname, user?.alunoId, user?.professorId, user?.tipo]);
-
+  const title = pageTitles[pathname] ?? 'Moeda Estudantil';
+  const subtitle = subtitleFor(pathname, user?.tipo);
   const mostraSaldo = (user?.tipo === 'ALUNO' || user?.tipo === 'PROFESSOR') && saldo !== null;
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-20">
       <div>
-        <h2 className="text-lg font-semibold text-slate-900">{page.title}</h2>
-        {page.subtitle && <p className="text-xs text-slate-500">{page.subtitle}</p>}
+        <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+        {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
       </div>
 
       <div className="flex items-center gap-3">

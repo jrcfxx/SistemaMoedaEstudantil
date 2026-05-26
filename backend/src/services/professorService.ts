@@ -4,6 +4,7 @@ import { alunoRepository } from '../repositories/alunoRepository';
 import { instituicaoRepository } from '../repositories/instituicaoRepository';
 import { AppError } from '../middlewares/errorHandler';
 import { publishEmail } from '../lib/emailQueue';
+import { assertProfessorAutorizado, RequestUser } from '../lib/authHelpers';
 import {
   CreateProfessorInput,
   UpdateProfessorInput,
@@ -28,6 +29,8 @@ export const professorService = {
     return professor;
   },
 
+  assertProfessorAutorizado,
+
   findTransacoes: async (professorId: string) => {
     const professor = await professorRepository.findById(professorId);
     if (!professor) throw new AppError('Professor não encontrado', 404);
@@ -47,7 +50,9 @@ export const professorService = {
     return professorRepository.create(parsed);
   },
 
-  update: async (id: string, data: UpdateProfessorInput) => {
+  update: async (id: string, data: UpdateProfessorInput, usuario?: RequestUser) => {
+    await assertProfessorAutorizado(id, usuario);
+
     const parsed = updateProfessorSchema.parse(data);
 
     const professor = await professorRepository.findById(id);
@@ -78,28 +83,37 @@ export const professorService = {
   distribuirMoedas: async (professorId: string, data: DistribuirMoedasInput) => {
     const { alunoId, valor, motivo } = distribuirMoedasSchema.parse(data);
 
-    const professor = await professorRepository.findById(professorId);
+    const professor = await prisma.professor.findUnique({
+      where: { id: professorId },
+      include: { usuario: { select: { email: true } } },
+    });
     if (!professor) throw new AppError('Professor não encontrado', 404);
-
-    if (professor.saldoMoedas < valor) {
-      throw new AppError(
-        `Saldo insuficiente. Você possui ${professor.saldoMoedas} moeda(s) e tentou distribuir ${valor}.`,
-        422,
-      );
-    }
 
     const aluno = await alunoRepository.findById(alunoId);
     if (!aluno) throw new AppError('Aluno não encontrado', 404);
 
-    return prisma.$transaction(async (tx) => {
-      await tx.professor.update({
-        where: { id: professorId },
+    if (aluno.instituicaoId !== professor.instituicaoId) {
+      throw new AppError('Aluno e professor devem pertencer à mesma instituição', 422);
+    }
+
+    const emailProfessor = professor.usuario?.email;
+
+    const result = await prisma.$transaction(async (tx) => {
+      const debito = await tx.professor.updateMany({
+        where: { id: professorId, saldoMoedas: { gte: valor } },
         data: { saldoMoedas: { decrement: valor } },
       });
+      if (debito.count === 0) {
+        throw new AppError(
+          `Saldo insuficiente. Você possui ${professor.saldoMoedas} moeda(s) e tentou distribuir ${valor}.`,
+          422,
+        );
+      }
 
-      await tx.aluno.update({
+      const alunoAtualizado = await tx.aluno.update({
         where: { id: alunoId },
         data: { saldoMoedas: { increment: valor } },
+        select: { saldoMoedas: true },
       });
 
       const transacao = await tx.transacaoMoeda.create({
@@ -110,22 +124,40 @@ export const professorService = {
         },
       });
 
-      const result = {
-        transacao,
-        saldoProfessor: professor.saldoMoedas - valor,
-      };
-
-      publishEmail({
-        tipo: 'MOEDAS_RECEBIDAS',
-        destinatario: aluno.email,
-        nomeAluno: aluno.nome,
-        nomeProfessor: professor.nome,
-        valor,
-        motivo,
-        saldoAtual: aluno.saldoMoedas + valor,
+      const professorAtualizado = await tx.professor.findUnique({
+        where: { id: professorId },
+        select: { saldoMoedas: true },
       });
 
-      return result;
+      return {
+        transacao,
+        saldoProfessor: professorAtualizado!.saldoMoedas,
+        saldoAtualAluno: alunoAtualizado.saldoMoedas,
+      };
     });
+
+    publishEmail({
+      tipo: 'MOEDAS_RECEBIDAS',
+      destinatario: aluno.email,
+      nomeAluno: aluno.nome,
+      nomeProfessor: professor.nome,
+      valor,
+      motivo,
+      saldoAtual: result.saldoAtualAluno,
+    });
+
+    if (emailProfessor) {
+      publishEmail({
+        tipo: 'MOEDAS_ENVIADAS',
+        destinatario: emailProfessor,
+        nomeProfessor: professor.nome,
+        nomeAluno: aluno.nome,
+        valor,
+        motivo,
+        saldoRestante: result.saldoProfessor,
+      });
+    }
+
+    return result;
   },
 };

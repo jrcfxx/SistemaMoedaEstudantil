@@ -34,7 +34,7 @@ export interface Professor {
 
 export interface TransacaoMoeda {
   id: string;
-  tipo: 'ENVIO' | 'RECEBIMENTO' | 'RESGATE';
+  tipo: 'ENVIO' | 'RESGATE';
   valor: number;
   motivo: string;
   alunoId: string;

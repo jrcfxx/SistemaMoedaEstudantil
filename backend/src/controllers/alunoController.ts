@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { assertAlunoAutorizado } from '../lib/authHelpers';
 import { alunoService } from '../services/alunoService';
 
 type IdParam = { id: string };
@@ -52,6 +53,7 @@ export const alunoController = {
 
   findTransacoes: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
+      await assertAlunoAutorizado(req.params.id, req.user);
       res.json(await alunoService.findTransacoes(req.params.id));
     } catch (error) {
       next(error);

@@ -34,7 +34,7 @@ export const empresaParceiraController = {
 
   update: async (req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const empresa = await empresaParceiraService.update(req.params.id, req.body);
+      const empresa = await empresaParceiraService.update(req.params.id, req.body, req.user);
       res.json(empresa);
     } catch (error) {
       next(error);

@@ -8,6 +8,7 @@ import { Select } from '../../components/ui/Select';
 import { Button } from '../../components/ui/Button';
 import { vantagemService } from '../../services/vantagemService';
 import { empresaService } from '../../services/empresaService';
+import { authService } from '../../services/authService';
 import { Vantagem, EmpresaParceira } from '../../types';
 
 const schema = z.object({
@@ -36,6 +37,10 @@ export function VantagemForm({ open, onClose, onSuccess, vantagem }: VantagemFor
   const [empresas, setEmpresas] = useState<EmpresaParceira[]>([]);
   const isEdit = !!vantagem;
 
+  const user = authService.getUser();
+  const isEmpresa = user?.tipo === 'EMPRESA';
+  const isAdmin = user?.tipo === 'ADMIN';
+
   const {
     register,
     handleSubmit,
@@ -44,11 +49,14 @@ export function VantagemForm({ open, onClose, onSuccess, vantagem }: VantagemFor
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
-    empresaService.findAll().then(setEmpresas).catch(() => {});
-  }, []);
+    if (isAdmin) {
+      empresaService.findAll().then(setEmpresas).catch(() => {});
+    }
+  }, [isAdmin]);
 
   useEffect(() => {
     if (open) {
+      const empresaId = isEmpresa ? (user?.empresaId ?? '') : (vantagem?.empresaParceiraId ?? '');
       reset(
         vantagem
           ? {
@@ -56,22 +64,34 @@ export function VantagemForm({ open, onClose, onSuccess, vantagem }: VantagemFor
               descricao: vantagem.descricao,
               fotoUrl: vantagem.fotoUrl ?? '',
               custoMoedas: vantagem.custoMoedas,
-              empresaParceiraId: vantagem.empresaParceiraId,
+              empresaParceiraId: empresaId,
             }
-          : { titulo: '', descricao: '', fotoUrl: '', custoMoedas: undefined, empresaParceiraId: '' },
+          : {
+              titulo: '',
+              descricao: '',
+              fotoUrl: '',
+              custoMoedas: undefined,
+              empresaParceiraId: empresaId,
+            },
       );
       setError('');
     }
-  }, [open, vantagem, reset]);
+  }, [open, vantagem, reset, isEmpresa, user?.empresaId]);
 
   const onSubmit = async (data: FormData) => {
+    if (isEmpresa && !user?.empresaId) {
+      setError('Seu usuário não está vinculado a uma empresa parceira.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
+      const payload = isEmpresa ? { ...data, empresaParceiraId: user!.empresaId! } : data;
       if (isEdit) {
-        await vantagemService.update(vantagem.id, data);
+        await vantagemService.update(vantagem.id, payload);
       } else {
-        await vantagemService.create(data);
+        await vantagemService.create(payload);
       }
       onSuccess();
       onClose();
@@ -81,6 +101,10 @@ export function VantagemForm({ open, onClose, onSuccess, vantagem }: VantagemFor
       setLoading(false);
     }
   };
+
+  const empresaNome = isEmpresa
+    ? empresas.find((e) => e.id === user?.empresaId)?.nome ?? user?.nome
+    : undefined;
 
   return (
     <Modal open={open} onClose={onClose} title={isEdit ? 'Editar Vantagem' : 'Nova Vantagem'}>
@@ -119,17 +143,30 @@ export function VantagemForm({ open, onClose, onSuccess, vantagem }: VantagemFor
             error={errors.fotoUrl?.message}
             {...register('fotoUrl')}
           />
-          <div className="sm:col-span-2">
-            <Select
-              label="Empresa Parceira"
-              options={empresas.map((e) => ({ value: e.id, label: e.nome }))}
-              placeholder="Selecione a empresa..."
-              error={errors.empresaParceiraId?.message}
-              required
-              disabled={isEdit}
-              {...register('empresaParceiraId')}
-            />
-          </div>
+
+          {isAdmin && (
+            <div className="sm:col-span-2">
+              <Select
+                label="Empresa Parceira"
+                options={empresas.map((e) => ({ value: e.id, label: e.nome }))}
+                placeholder="Selecione a empresa..."
+                error={errors.empresaParceiraId?.message}
+                required
+                disabled={isEdit}
+                {...register('empresaParceiraId')}
+              />
+            </div>
+          )}
+
+          {isEmpresa && (
+            <div className="sm:col-span-2">
+              <label className="label">Empresa Parceira</label>
+              <p className="text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5">
+                {empresaNome ?? 'Sua empresa'}
+              </p>
+              <input type="hidden" {...register('empresaParceiraId')} />
+            </div>
+          )}
         </div>
 
         {error && (
