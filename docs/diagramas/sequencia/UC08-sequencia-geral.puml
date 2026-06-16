@@ -1,0 +1,153 @@
+@startuml UC08_Sequencia_Geral
+title Diagrama de Sequência Geral — Sistema de Moeda Estudantil
+
+autonumber
+
+actor Aluno as aluno
+actor Professor as prof
+actor "Empresa\nParceira" as emp
+participant "Frontend\n(React)" as fe
+participant "Backend\n(Express MVC)" as be
+database "PostgreSQL" as db
+queue "RabbitMQ" as mq
+participant "E-mail\n(SMTP)" as mail
+
+== Autenticação e Cadastro ==
+
+aluno -> fe: POST /register/aluno
+activate fe
+fe -> be: cria Usuario + Aluno
+activate be
+be -> db: persist (transação)
+activate db
+db --> be: OK
+deactivate db
+be --> fe: token JWT
+deactivate be
+fe --> aluno: acesso ao sistema
+deactivate fe
+
+emp -> fe: POST /register/empresa
+activate fe
+fe -> be: cria Usuario + EmpresaParceira
+activate be
+be -> db: persist
+activate db
+db --> be: OK
+deactivate db
+be --> fe: token JWT
+deactivate be
+fe --> emp: acesso ao sistema
+deactivate fe
+
+== Crédito Semestral ==
+
+prof -> fe: Login
+activate fe
+fe -> be: POST /auth/login
+activate be
+be -> db: garantirCreditoSemestral
+activate db
+db --> be: +1000 moedas (se novo semestre)
+deactivate db
+be --> fe: token + creditoSemestral
+deactivate be
+fe --> prof: Dashboard
+deactivate fe
+
+== Distribuição de Moedas ==
+
+prof -> fe: Distribuir moedas
+activate fe
+fe -> be: POST /distribuir-moedas
+activate be
+be -> db: transação atômica
+activate db
+db --> be: OK
+deactivate db
+be -> mq: notificações
+activate mq
+mq --> be: enfileirado
+deactivate mq
+be --> fe: confirmação
+deactivate be
+fe --> prof: sucesso
+deactivate fe
+mq -> mail: templates professor e aluno
+activate mail
+mail --> mq: enviados
+deactivate mail
+
+== Vantagens ==
+
+emp -> fe: Cadastrar vantagem
+activate fe
+fe -> be: POST /vantagens
+activate be
+be -> db: create Vantagem
+activate db
+db --> be: OK
+deactivate db
+be --> fe: 201
+deactivate be
+fe --> emp: vantagem cadastrada
+deactivate fe
+
+aluno -> fe: Listar e resgatar
+activate fe
+fe -> be: GET /vantagens
+activate be
+be -> db: consulta catálogo
+activate db
+db --> be: vantagens
+deactivate db
+be --> fe: lista
+deactivate be
+fe -> be: POST /resgatar
+activate be
+be -> db: débito + cupom
+activate db
+db --> be: resgate
+deactivate db
+be -> mq: e-mails de resgate
+activate mq
+mq --> be: enfileirado
+deactivate mq
+be --> fe: codigoCupom
+deactivate be
+fe --> aluno: cupom exibido
+deactivate fe
+mq -> mail: cupom aluno + aviso empresa
+activate mail
+mail --> mq: enviados
+deactivate mail
+
+== Extrato ==
+
+aluno -> fe: Meu extrato
+activate fe
+fe -> be: GET transações / resgates
+activate be
+be -> db: consulta histórico
+activate db
+db --> be: dados
+deactivate db
+be --> fe: JSON
+deactivate be
+fe --> aluno: extrato exibido
+deactivate fe
+
+prof -> fe: Meu extrato
+activate fe
+fe -> be: GET transações professor
+activate be
+be -> db: consulta distribuições
+activate db
+db --> be: dados
+deactivate db
+be --> fe: JSON
+deactivate be
+fe --> prof: extrato exibido
+deactivate fe
+
+@enduml

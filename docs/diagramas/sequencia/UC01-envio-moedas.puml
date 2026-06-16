@@ -1,0 +1,70 @@
+@startuml UC01_Envio_de_Moedas
+title Caso de Uso: Envio de Moedas (Professor → Aluno)
+
+autonumber
+
+actor Professor as prof
+participant "Frontend\n(React)" as fe
+participant "ProfessorController" as ctrl
+participant "ProfessorService" as svc
+participant "CreditoSemestralService" as credito
+database "PostgreSQL\n(Prisma)" as db
+queue "RabbitMQ" as mq
+participant "EmailWorker" as worker
+participant "Nodemailer\n(SMTP)" as smtp
+
+prof -> fe: Seleciona aluno, valor e motivo
+activate fe
+
+fe -> ctrl: POST /professores/:id/distribuir-moedas
+activate ctrl
+
+ctrl -> svc: distribuirMoedas(professorId, dados)
+activate svc
+
+svc -> credito: garantirCredito(professorId)
+activate credito
+credito -> db: $transaction\n(verifica semestre + credita se necessário)
+activate db
+db --> credito: OK
+deactivate db
+credito --> svc: { creditado }
+deactivate credito
+
+svc -> db: $transaction\n(débito professor, crédito aluno,\ncria TransacaoMoeda)
+activate db
+db --> svc: transação confirmada
+deactivate db
+
+svc -> mq: publishEmail(MOEDAS_RECEBIDAS)
+activate mq
+mq --> svc: enfileirado
+deactivate mq
+
+svc -> mq: publishEmail(MOEDAS_ENVIADAS)
+activate mq
+mq --> svc: enfileirado
+deactivate mq
+
+svc --> ctrl: resultado + saldos
+deactivate svc
+
+ctrl --> fe: 201 Created
+deactivate ctrl
+
+fe --> prof: Confirmação na UI
+deactivate fe
+
+mq -> worker: consume mensagem
+activate worker
+worker -> smtp: enviar template aluno
+activate smtp
+smtp --> worker: OK
+deactivate smtp
+worker -> smtp: enviar template professor
+activate smtp
+smtp --> worker: OK
+deactivate smtp
+deactivate worker
+
+@enduml

@@ -1,0 +1,56 @@
+@startuml UC03_Extrato_Professor
+title Caso de Uso: Consulta de Extrato do Professor
+
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+
+autonumber
+
+actor Professor as prof
+participant "Frontend\n(ExtratoProfessor)" as fe
+participant "ProfessorController" as ctrl
+participant "ProfessorService" as svc
+participant "ProfessorRepository" as repo
+database "PostgreSQL\n(Prisma)" as db
+
+prof -> fe: Acessa "Meu Extrato"
+activate fe
+
+fe -> ctrl: GET /professores/:id/transacoes\nAuthorization: Bearer token
+activate ctrl
+
+ctrl -> svc: assertProfessorAutorizado(professorId, usuario)
+activate svc
+
+svc -> db: findFirst Professor\n(where usuarioId = sub)
+activate db
+db --> svc: professorId autorizado
+deactivate db
+
+svc --> ctrl: OK
+deactivate svc
+
+ctrl -> svc: findTransacoes(professorId)
+activate svc
+
+svc -> repo: findTransacoes(professorId)
+activate repo
+
+repo -> db: findMany TransacaoMoeda\n(where professorId, orderBy desc)
+activate db
+db --> repo: envios + aluno + motivo
+deactivate db
+
+repo --> svc: transacoes[]
+deactivate repo
+
+svc --> ctrl: transacoes[]
+deactivate svc
+
+ctrl --> fe: 200 OK (JSON)
+deactivate ctrl
+
+fe --> prof: Exibe total distribuido\ne historico de envios
+deactivate fe
+
+@enduml

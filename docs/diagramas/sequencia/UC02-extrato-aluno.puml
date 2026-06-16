@@ -1,0 +1,54 @@
+@startuml UC02_Extrato_Aluno
+title Caso de Uso: Consulta de Extrato do Aluno
+
+autonumber
+
+actor Aluno as aluno
+participant "Frontend\n(ExtratoAluno)" as fe
+participant "AlunoController" as ctrlAluno
+participant "AlunoService" as svcAluno
+participant "VantagemController" as ctrlVant
+participant "VantagemService" as svcVant
+database "PostgreSQL\n(Prisma)" as db
+
+aluno -> fe: Acessa "Meu Extrato"
+activate fe
+
+fe -> ctrlAluno: GET /alunos/:id/transacoes
+activate ctrlAluno
+
+ctrlAluno -> svcAluno: findTransacoes(alunoId)
+activate svcAluno
+
+svcAluno -> db: findMany TransacaoMoeda
+activate db
+db --> svcAluno: histórico ENVIO e RESGATE
+deactivate db
+
+svcAluno --> ctrlAluno: transações
+deactivate svcAluno
+
+ctrlAluno --> fe: JSON transações
+deactivate ctrlAluno
+
+fe -> ctrlVant: GET /vantagens/resgates/aluno/:id
+activate ctrlVant
+
+ctrlVant -> svcVant: findResgatesByAluno(alunoId)
+activate svcVant
+
+svcVant -> db: findMany Resgate + Vantagem
+activate db
+db --> svcVant: cupons gerados
+deactivate db
+
+svcVant --> ctrlVant: resgates
+deactivate svcVant
+
+ctrlVant --> fe: JSON cupons
+deactivate ctrlVant
+
+fe --> aluno: Exibe resumo\n(recebido, gasto, cupons)
+deactivate fe
+
+@enduml

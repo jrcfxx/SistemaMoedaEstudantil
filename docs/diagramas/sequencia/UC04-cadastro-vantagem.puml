@@ -1,0 +1,48 @@
+@startuml UC04_Cadastro_Vantagem
+title Caso de Uso: Cadastro de Vantagem (Empresa Parceira)
+
+autonumber
+
+actor "Empresa\nParceira" as emp
+participant "Frontend\n(VantagemForm)" as fe
+participant "VantagemController" as ctrl
+participant "VantagemService" as svc
+database "PostgreSQL\n(Prisma)" as db
+
+emp -> fe: Preenche título, descrição,\nfoto e custo em moedas
+activate fe
+
+fe -> ctrl: POST /vantagens
+activate ctrl
+
+ctrl -> svc: create(dados, usuario)
+activate svc
+
+svc -> svc: resolve empresaParceiraId\n(papel EMPRESA)
+activate svc
+deactivate svc
+
+svc -> svc: assertEmpresaAutorizada()
+activate svc
+deactivate svc
+
+svc -> db: find empresa (status ATIVA)
+activate db
+db --> svc: empresa encontrada
+deactivate db
+
+svc -> db: create Vantagem
+activate db
+db --> svc: vantagem criada
+deactivate db
+
+svc --> ctrl: vantagem
+deactivate svc
+
+ctrl --> fe: 201 Created
+deactivate ctrl
+
+fe --> emp: Vantagem exibida no catálogo
+deactivate fe
+
+@enduml

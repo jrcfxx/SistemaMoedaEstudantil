@@ -1,0 +1,35 @@
+@startuml UC05_Listagem_Vantagens
+title Caso de Uso: Listagem de Vantagens (Aluno)
+
+autonumber
+
+actor Aluno as aluno
+participant "Frontend\n(VantagensList)" as fe
+participant "VantagemController" as ctrl
+participant "VantagemService" as svc
+database "PostgreSQL\n(Prisma)" as db
+
+aluno -> fe: Acessa catálogo de vantagens
+activate fe
+
+fe -> ctrl: GET /vantagens?search=
+activate ctrl
+
+ctrl -> svc: findAll(search)
+activate svc
+
+svc -> db: findMany Vantagem\n+ EmpresaParceira
+activate db
+db --> svc: vantagens ativas
+deactivate db
+
+svc --> ctrl: lista
+deactivate svc
+
+ctrl --> fe: JSON
+deactivate ctrl
+
+fe --> aluno: Cards com foto, custo\ne botão Resgatar
+deactivate fe
+
+@enduml

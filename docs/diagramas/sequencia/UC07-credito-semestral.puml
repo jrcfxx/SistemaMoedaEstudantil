@@ -1,0 +1,47 @@
+@startuml UC07_Credito_Semestral
+title Caso de Uso: Creditar Moedas Semestrais
+
+autonumber
+
+actor Professor as prof
+participant "Frontend\n(Login)" as fe
+participant "AuthController" as ctrl
+participant "AuthService" as auth
+participant "CreditoSemestralService" as credito
+database "PostgreSQL\n(Prisma)" as db
+
+prof -> fe: Informa e-mail e senha
+activate fe
+
+fe -> ctrl: POST /auth/login
+activate ctrl
+
+ctrl -> auth: login(credenciais)
+activate auth
+
+auth -> db: findUnique Usuario\n+ valida senhaHash
+activate db
+db --> auth: usuario (tipo PROFESSOR)
+deactivate db
+
+auth -> credito: garantirCredito(professorId)
+activate credito
+
+credito -> db: $transaction\n(se ultimoCreditoSemestre != semestre atual:\n+1000 moedas, atualiza semestre)
+activate db
+db --> credito: OK (rows updated)
+deactivate db
+
+credito --> auth: { creditado, valor }
+deactivate credito
+
+auth --> ctrl: token JWT + creditoSemestral
+deactivate auth
+
+ctrl --> fe: 200 OK
+deactivate ctrl
+
+fe --> prof: Redireciona ao Dashboard\n(+ aviso de crédito se aplicável)
+deactivate fe
+
+@enduml

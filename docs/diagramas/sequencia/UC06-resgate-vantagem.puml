@@ -1,0 +1,55 @@
+@startuml UC06_Resgate_Vantagem
+title Caso de Uso: Resgate de Vantagem (Aluno)
+
+autonumber
+
+actor Aluno as aluno
+participant "Frontend\n(ResgateModal)" as fe
+participant "VantagemController" as ctrl
+participant "VantagemService" as svc
+database "PostgreSQL\n(Prisma)" as db
+queue "RabbitMQ" as mq
+participant "EmailWorker" as worker
+participant "Nodemailer\n(SMTP)" as smtp
+
+aluno -> fe: Confirma resgate da vantagem
+activate fe
+
+fe -> ctrl: POST /vantagens/resgatar
+activate ctrl
+
+ctrl -> svc: resgatar({ alunoId, vantagemId })
+activate svc
+
+svc -> db: $transaction\n(débito saldo, TransacaoMoeda RESGATE,\nResgate + codigoCupom)
+activate db
+db --> svc: resgate confirmado
+deactivate db
+
+svc -> mq: publishEmail(RESGATE_REALIZADO)
+activate mq
+mq --> svc: enfileirado
+deactivate mq
+
+svc --> ctrl: cupom + saldo restante
+deactivate svc
+
+ctrl --> fe: 201 Created
+deactivate ctrl
+
+fe --> aluno: Exibe código do cupom
+deactivate fe
+
+mq -> worker: consume mensagem
+activate worker
+worker -> smtp: e-mail cupom → aluno
+activate smtp
+smtp --> worker: OK
+deactivate smtp
+worker -> smtp: e-mail validação → empresa
+activate smtp
+smtp --> worker: OK
+deactivate smtp
+deactivate worker
+
+@enduml
