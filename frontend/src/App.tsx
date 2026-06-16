@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AlunosList from './pages/alunos/AlunosList';
 import ProfessoresList from './pages/professores/ProfessoresList';
@@ -50,6 +51,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/" element={<ProtectedPage><Navigate to="/dashboard" replace /></ProtectedPage>} />
         <Route path="/dashboard" element={<ProtectedPage><Dashboard /></ProtectedPage>} />
         <Route path="/vantagens" element={<ProtectedPage><VantagensList /></ProtectedPage>} />

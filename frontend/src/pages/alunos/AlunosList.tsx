@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Plus, Pencil, Trash2, GraduationCap, Coins } from 'lucide-react';
+import { CoinAmount } from '../../components/ui/CoinIcon';
 import { Button } from '../../components/ui/Button';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { Spinner } from '../../components/ui/Spinner';
@@ -163,9 +164,12 @@ export default function AlunosList() {
                     </td>
                     <td className="table-cell text-slate-600">{aluno.curso}</td>
                     <td className="table-cell">
-                      <span className="inline-flex items-center gap-1 text-amber-600 font-semibold text-sm">
-                        🪙 {aluno.saldoMoedas}
-                      </span>
+                      <CoinAmount
+                        amount={aluno.saldoMoedas}
+                        className="text-amber-600 font-semibold text-sm"
+                        iconClassName="text-amber-600"
+                        iconSize={14}
+                      />
                     </td>
                     <td className="table-cell">
                       <div className="flex items-center justify-center gap-1">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CheckCircle2, AlertCircle, Gift, Copy, Check, RefreshCw } from 'lucide-react';
+import { CoinAmount } from '../../components/ui/CoinIcon';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
 import { vantagemService } from '../../services/vantagemService';
@@ -107,7 +108,12 @@ export function ResgateModal({ open, vantagem, onClose }: ResgateModalProps) {
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <p className="font-semibold text-slate-800 text-sm leading-tight">{vantagem.titulo}</p>
-                <span className="text-amber-600 font-bold text-base whitespace-nowrap ml-2">🪙 {vantagem.custoMoedas}</span>
+                <CoinAmount
+                  amount={vantagem.custoMoedas}
+                  className="text-amber-600 font-bold text-base whitespace-nowrap ml-2"
+                  iconClassName="text-amber-600"
+                  iconSize={18}
+                />
               </div>
               <p className="text-slate-500 text-xs mt-1 line-clamp-2">{vantagem.descricao}</p>
               {vantagem.empresa && (
@@ -138,12 +144,21 @@ export function ResgateModal({ open, vantagem, onClose }: ResgateModalProps) {
                 <p className={`text-xs font-medium uppercase tracking-wide ${saldoSuficiente ? 'text-green-600' : 'text-red-500'}`}>
                   Seu saldo atual
                 </p>
-                <p className={`text-2xl font-bold mt-0.5 ${saldoSuficiente ? 'text-green-700' : 'text-red-600'}`}>
-                  🪙 {saldoAtual}
-                </p>
+                <CoinAmount
+                  amount={saldoAtual}
+                  className={`text-2xl font-bold mt-0.5 ${saldoSuficiente ? 'text-green-700' : 'text-red-600'}`}
+                  iconClassName={saldoSuficiente ? 'text-green-600' : 'text-red-500'}
+                  iconSize={24}
+                />
                 {!saldoSuficiente && (
-                  <p className="text-red-500 text-xs mt-0.5">
-                    Faltam 🪙 {vantagem.custoMoedas - saldoAtual} moeda(s)
+                  <p className="text-red-500 text-xs mt-0.5 inline-flex items-center gap-1 flex-wrap">
+                    Faltam
+                    <CoinAmount
+                      amount={vantagem.custoMoedas - saldoAtual}
+                      suffix="moeda(s)"
+                      iconSize={12}
+                      iconClassName="text-red-500"
+                    />
                   </p>
                 )}
               </div>
@@ -202,7 +217,10 @@ export function ResgateModal({ open, vantagem, onClose }: ResgateModalProps) {
           <div className="bg-slate-50 rounded-xl p-4 text-left space-y-1">
             <p className="text-sm font-medium text-slate-700">{vantagem.titulo}</p>
             {vantagem.empresa && <p className="text-xs text-slate-500">{vantagem.empresa.nome}</p>}
-            <p className="text-xs text-amber-600 font-semibold mt-1">Saldo restante: 🪙 {saldoRestante}</p>
+            <p className="text-xs text-amber-600 font-semibold mt-1 inline-flex items-center gap-1">
+              Saldo restante:
+              <CoinAmount amount={saldoRestante} iconSize={14} iconClassName="text-amber-600" />
+            </p>
           </div>
 
           <Button className="w-full" onClick={onClose}>Concluir</Button>

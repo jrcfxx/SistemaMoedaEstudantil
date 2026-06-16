@@ -137,7 +137,7 @@ EmpresaParceira → id, nome, email, cnpj, endereco, telefone?, status(ATIVA|INA
 
 ```
 Usuario        → id, nome, email, senhaHash, tipo(ALUNO|PROFESSOR|EMPRESA|ADMIN)
-Professor      → id, nome, cpf, departamento, saldoMoedas(=1000), instituicaoId, usuarioId?
+Professor      → id, nome, cpf, departamento, saldoMoedas(=1000), ultimoCreditoSemestre, instituicaoId, usuarioId?
 TransacaoMoeda → id, tipo(ENVIO|RESGATE), valor, motivo, alunoId, professorId?, vantagemId?
 Vantagem       → id, titulo, descricao, fotoUrl?, custoMoedas, empresaParceiraId
 Resgate        → id, codigoCupom(único), status(PENDENTE|UTILIZADO), alunoId, vantagemId
@@ -178,7 +178,7 @@ Cada incremento representa uma entrega funcional ou artefato de projeto vinculad
 | 1 | Diagrama de Casos de Uso | Lab03S01 | ✅ Concluído |
 | 2 | Histórias do Usuário (HU01–HU18) | Lab03S01 | ✅ Concluído |
 | 3 | Diagrama de Classes | Lab03S01 | ✅ Concluído |
-| 4 | Diagrama de Componentes | Lab03S01 | 🔄 Em andamento |
+| 4 | Diagrama de Componentes | Lab03S01 | ✅ Concluído |
 | 5 | Modelo ER — `prisma/schema.prisma` | Lab03S02 | ✅ Concluído |
 | 6 | Configuração do banco de dados (PostgreSQL + Docker) | Lab03S02 | ✅ Concluído |
 | 7 | Camada de persistência com Prisma ORM (schema + migrations) | Lab03S02 | ✅ Concluído |
@@ -193,7 +193,7 @@ Cada incremento representa uma entrega funcional ou artefato de projeto vinculad
 | 16 | Módulo de Aluno: resgate de vantagens + geração de cupom com código único | Lab03S03 | ✅ Concluído |
 | 17 | Notificações por e-mail (recebimento de moedas e resgate de vantagem) via RabbitMQ | Lab03S03 | ✅ Concluído |
 | 18 | Extrato de conta (professores e alunos) | Lab03S03 | ✅ Concluído |
-| 19 | Diagrama de Arquitetura + slides para apresentação | Lab03S03 | ⏳ Pendente |
+| 19 | Diagrama de Arquitetura + slides para apresentação | Lab03S03 | ✅ Concluído |
 
 ### Release 2 — Entregáveis incrementais (Lab 04)
 
@@ -202,8 +202,10 @@ Conforme **Laboratório 04 — Sistema de Moeda Estudantil (Release 2)**. Ao fin
 | # | Entregável incremental | Sprint | O que inclui (conforme enunciado) | Status |
 |:-:|---|:---:|---|:---:|
 | 20 | **Lab04S01** — Envio de moedas, extrato e e-mails | Lab04S01 | Casos de uso de **envio de moedas** e **consulta de extrato** (professor e aluno). **E-mail** confirmando envio (template professor) e recebimento (template aluno). *Opcional:* demonstração em **vídeo** se não for possível reproduzir o ambiente no laboratório. | ✅ Concluído |
-| 21 | **Lab04S02** — Diagramas de sequência, vantagens e listagem | Lab04S02 | **Diagramas de sequência** (um por caso de uso). Implementação: **cadastro de vantagens** (empresa parceira) e **listagem de vantagens** (aluno). | ⏳ Pendente |
-| 22 | **Lab04S03** — Diagrama de sequência geral e troca de vantagens | Lab04S03 | **Diagrama de sequência geral** e implementação do caso de uso de **troca de vantagens** (pelo aluno). | ⏳ Pendente |
+| 21 | **Lab04S02** — Diagramas de sequência, vantagens e listagem | Lab04S02 | **Diagramas de sequência** (um por caso de uso). Implementação: **cadastro de vantagens** (empresa parceira) e **listagem de vantagens** (aluno). | ✅ Concluído |
+| 22 | **Lab04S03** — Diagrama de sequência geral e troca de vantagens | Lab04S03 | **Diagrama de sequência geral** e implementação do caso de uso de **troca de vantagens** (pelo aluno). | ✅ Concluído |
+| 23 | Cadastro com autenticação (Usuario vinculado) + auto-cadastro aluno/empresa | Lab04 | Registro público (`/register`) e criação admin com senha em transação atômica. | ✅ Concluído |
+| 24 | Crédito semestral de 1.000 moedas (acumulável) | Lab04 | Renovação automática ao login do professor quando o semestre muda. | ✅ Concluído |
 
 > **Legenda:** ✅ Concluído &nbsp;|&nbsp; 🔄 Em andamento &nbsp;|&nbsp; ⏳ Pendente
 
@@ -295,7 +297,9 @@ Base URL: `http://localhost:3333/api`
 | Método | Rota | Auth | Descrição |
 |---|---|:---:|---|
 | `POST` | `/auth/login` | — | Autentica usuário e retorna token JWT |
-| `POST` | `/auth/register` | — | Cadastra novo usuário |
+| `POST` | `/auth/register` | — | Cadastra usuário (legado) |
+| `POST` | `/auth/register/aluno` | — | Auto-cadastro de aluno (perfil + login) |
+| `POST` | `/auth/register/empresa` | — | Auto-cadastro de empresa parceira |
 | `GET` | `/auth/me` | ✅ | Retorna dados do usuário autenticado |
 
 ### Alunos
@@ -502,21 +506,29 @@ SistemaMoedaEstudantil/
 
 ### Diagrama de Componentes
 
-> Em elaboração — Sprint 01. Arquivo `.drawio` disponível em `docs/diagramas/componentes/`.
-
-### Modelo ER
-
-> Implementado como `backend/prisma/schema.prisma` — Sprint 02. O arquivo contém todas as entidades, relacionamentos e enums do sistema.
+<img width="700" alt="Diagrama de componentes do Sistema de Moeda Estudantil" src="docs/diagramas/componentes/DiagramaComponentes_rabbitmq.drawio.png"/>
 
 ### Diagrama de Arquitetura
 
-> Em elaboração — Lab03S03 / Release 1.
+<img width="700" alt="Diagrama de arquitetura do Sistema de Moeda Estudantil" src="docs/diagramas/arquitetura/Arquitetura_SistemaMoeda.jpeg"/>
+
+### Modelo ER
+
+> Implementado como `backend/prisma/schema.prisma` — Sprint 02. Imagem em `docs/diagramas/modelo-er/ModeloER.png`.
 
 ### Diagramas de sequência (Release 2 — Lab 04)
 
-> **Lab04S02:** um diagrama de sequência por caso de uso abrangido na sprint (ex.: cadastro de vantagens, listagem para o aluno).  
-> **Lab04S03:** diagrama de sequência **geral** do sistema ou do fluxo principal acordado com o docente.  
-> Sugestão de pasta: `docs/diagramas/sequencia/`.
+Arquivos em [`docs/diagramas/sequencia/`](docs/diagramas/sequencia/README.md) (formato Mermaid):
+
+| UC | Caso de uso | Sprint |
+|---|---|:---:|
+| UC01 | Envio de moedas | Lab04S01 |
+| UC02 | Extrato do aluno | Lab04S01 |
+| UC03 | Extrato do professor | Lab04S01 |
+| UC04 | Cadastro de vantagem | Lab04S02 |
+| UC05 | Listagem de vantagens | Lab04S02 |
+| UC06 | Resgate de vantagem | Lab04S03 |
+| UC07 | Sequência geral do sistema | Lab04S03 |
 
 ---
 

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Plus, Pencil, Trash2, Coins, SendHorizonal } from 'lucide-react';
+import { CoinAmount } from '../../components/ui/CoinIcon';
 import { Button } from '../../components/ui/Button';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { Spinner } from '../../components/ui/Spinner';
@@ -132,9 +133,12 @@ export default function ProfessoresList() {
                       <Badge label={prof.instituicao?.nome ?? '—'} variant="info" />
                     </td>
                     <td className="table-cell">
-                      <span className={`inline-flex items-center gap-1 font-semibold text-sm ${prof.saldoMoedas === 0 ? 'text-red-500' : 'text-amber-600'}`}>
-                        🪙 {prof.saldoMoedas}
-                      </span>
+                      <CoinAmount
+                        amount={prof.saldoMoedas}
+                        className={`font-semibold text-sm ${prof.saldoMoedas === 0 ? 'text-red-500' : 'text-amber-600'}`}
+                        iconClassName={prof.saldoMoedas === 0 ? 'text-red-500' : 'text-amber-600'}
+                        iconSize={14}
+                      />
                     </td>
                     <td className="table-cell">
                       <div className="flex items-center justify-center gap-1">

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { ArrowDownCircle, ShoppingBag, ReceiptText, Coins } from 'lucide-react';
+import { CoinAmount } from '../../components/ui/CoinIcon';
 import { Spinner } from '../../components/ui/Spinner';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { alunoService } from '../../services/alunoService';
@@ -79,7 +80,7 @@ export default function ExtratoAluno() {
           </div>
           <div>
             <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Total recebido</p>
-            <p className="text-xl font-bold text-green-700">🪙 {totalRecebido}</p>
+            <p className="text-xl font-bold text-green-700"><CoinAmount amount={totalRecebido} iconClassName="text-green-600" /></p>
           </div>
         </div>
         <div className="card p-4 flex items-center gap-4">
@@ -88,7 +89,7 @@ export default function ExtratoAluno() {
           </div>
           <div>
             <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Total gasto</p>
-            <p className="text-xl font-bold text-red-600">🪙 {totalGasto}</p>
+            <p className="text-xl font-bold text-red-600"><CoinAmount amount={totalGasto} iconClassName="text-red-500" /></p>
           </div>
         </div>
         <div className="card p-4 flex items-center gap-4">
@@ -147,8 +148,8 @@ export default function ExtratoAluno() {
                       </p>
                       <p className="text-xs text-slate-400">{formatDate(t.createdAt)}</p>
                     </div>
-                    <span className={`text-sm font-bold whitespace-nowrap ${cfg.color}`}>
-                      {cfg.sinal}🪙 {t.valor}
+                    <span className={`text-sm font-bold whitespace-nowrap inline-flex items-center gap-1 ${cfg.color}`}>
+                      {cfg.sinal}<CoinAmount amount={t.valor} iconSize={14} iconClassName={cfg.color} />
                     </span>
                   </div>
                 );
@@ -176,7 +177,9 @@ export default function ExtratoAluno() {
                       {STATUS_CUPOM[r.status]?.label ?? r.status}
                     </span>
                     <p className="font-mono text-sm font-bold text-indigo-700 tracking-wider">{r.codigoCupom}</p>
-                    <p className="text-xs text-amber-600 mt-0.5">🪙 {r.vantagem?.custoMoedas}</p>
+                    <p className="text-xs text-amber-600 mt-0.5 inline-flex items-center gap-1">
+                      <CoinAmount amount={r.vantagem?.custoMoedas ?? 0} iconSize={12} />
+                    </p>
                   </div>
                 </div>
               ))}

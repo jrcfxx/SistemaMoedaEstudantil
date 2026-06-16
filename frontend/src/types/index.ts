@@ -48,6 +48,8 @@ export interface TransacaoMoeda {
 
 export interface CreateProfessorInput {
   nome: string;
+  email: string;
+  senha: string;
   cpf: string;
   departamento: string;
   instituicaoId: string;
@@ -74,6 +76,7 @@ export interface EmpresaParceira {
 export interface CreateAlunoInput {
   nome: string;
   email: string;
+  senha: string;
   cpf: string;
   rg: string;
   endereco: string;
@@ -120,6 +123,7 @@ export interface ResgateInput {
 export interface CreateEmpresaParceiraInput {
   nome: string;
   email: string;
+  senha: string;
   cnpj: string;
   endereco: string;
   telefone?: string;

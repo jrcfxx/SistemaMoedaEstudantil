@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { ArrowUpCircle, ReceiptText, Coins, Users } from 'lucide-react';
+import { CoinAmount } from '../../components/ui/CoinIcon';
 import { Spinner } from '../../components/ui/Spinner';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { professorService } from '../../services/professorService';
@@ -62,7 +63,7 @@ export default function ExtratoProfessor() {
           </div>
           <div>
             <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Total distribuído</p>
-            <p className="text-xl font-bold text-indigo-700">🪙 {totalDistribuido}</p>
+            <p className="text-xl font-bold text-indigo-700"><CoinAmount amount={totalDistribuido} iconClassName="text-indigo-600" /></p>
           </div>
         </div>
         <div className="card p-4 flex items-center gap-4">
@@ -113,8 +114,8 @@ export default function ExtratoProfessor() {
                   </p>
                   <p className="text-xs text-slate-400">{formatDate(t.createdAt)}</p>
                 </div>
-                <span className="text-sm font-bold text-indigo-600 whitespace-nowrap">
-                  -🪙 {t.valor}
+                <span className="text-sm font-bold text-indigo-600 whitespace-nowrap inline-flex items-center gap-1">
+                  -<CoinAmount amount={t.valor} iconSize={14} iconClassName="text-indigo-600" />
                 </span>
               </div>
             ))}

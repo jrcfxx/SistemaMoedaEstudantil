@@ -4,6 +4,9 @@ import { alunoRepository } from '../repositories/alunoRepository';
 import { instituicaoRepository } from '../repositories/instituicaoRepository';
 import { AppError } from '../middlewares/errorHandler';
 import { publishEmail } from '../lib/emailQueue';
+import { criarUsuario } from '../lib/createUsuario';
+import { getSemestreAtual } from '../lib/semestre';
+import { creditoSemestralService } from './creditoSemestralService';
 import { assertProfessorAutorizado, RequestUser } from '../lib/authHelpers';
 import {
   CreateProfessorInput,
@@ -30,6 +33,7 @@ export const professorService = {
   },
 
   assertProfessorAutorizado,
+  garantirCreditoSemestral: creditoSemestralService.garantirCredito,
 
   findTransacoes: async (professorId: string) => {
     const professor = await professorRepository.findById(professorId);
@@ -38,16 +42,38 @@ export const professorService = {
   },
 
   create: async (data: CreateProfessorInput) => {
-    const parsed = createProfessorSchema.parse(data);
-    parsed.cpf = normalizeCpf(parsed.cpf);
+    const { senha, ...perfil } = createProfessorSchema.parse(data);
+    perfil.cpf = normalizeCpf(perfil.cpf);
 
-    const instituicao = await instituicaoRepository.findById(parsed.instituicaoId);
+    const instituicao = await instituicaoRepository.findById(perfil.instituicaoId);
     if (!instituicao) throw new AppError('Instituição não encontrada', 404);
 
-    const cpfExistente = await professorRepository.findByCpf(parsed.cpf);
+    const cpfExistente = await professorRepository.findByCpf(perfil.cpf);
     if (cpfExistente) throw new AppError('CPF já cadastrado', 409);
 
-    return professorRepository.create(parsed);
+    const semestre = getSemestreAtual();
+
+    return prisma.$transaction(async (tx) => {
+      const usuario = await criarUsuario(tx, {
+        nome: perfil.nome,
+        email: perfil.email,
+        senha,
+        tipo: 'PROFESSOR',
+      });
+
+      return tx.professor.create({
+        data: {
+          nome: perfil.nome,
+          cpf: perfil.cpf,
+          departamento: perfil.departamento,
+          instituicaoId: perfil.instituicaoId,
+          saldoMoedas: 1000,
+          ultimoCreditoSemestre: semestre,
+          usuarioId: usuario.id,
+        },
+        include: { instituicao: { select: { id: true, nome: true } } },
+      });
+    });
   },
 
   update: async (id: string, data: UpdateProfessorInput, usuario?: RequestUser) => {
@@ -81,6 +107,8 @@ export const professorService = {
   },
 
   distribuirMoedas: async (professorId: string, data: DistribuirMoedasInput) => {
+    await creditoSemestralService.garantirCredito(professorId);
+
     const { alunoId, valor, motivo } = distribuirMoedasSchema.parse(data);
 
     const professor = await prisma.professor.findUnique({

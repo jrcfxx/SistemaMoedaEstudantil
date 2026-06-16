@@ -1,15 +1,18 @@
 import { z } from 'zod';
 
 const cpfRegex = /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/;
+const senhaSchema = z.string().min(6, 'Senha deve ter pelo menos 6 caracteres');
 
 export const createProfessorSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
+  email: z.string().email('E-mail inválido'),
+  senha: senhaSchema,
   cpf: z.string().regex(cpfRegex, 'CPF inválido (ex: 12345678901 ou 123.456.789-01)'),
   departamento: z.string().min(2, 'Departamento deve ter ao menos 2 caracteres'),
   instituicaoId: z.string().min(1, 'Instituição é obrigatória'),
 });
 
-export const updateProfessorSchema = createProfessorSchema.partial();
+export const updateProfessorSchema = createProfessorSchema.omit({ senha: true }).partial();
 
 export const distribuirMoedasSchema = z.object({
   alunoId: z.string().min(1, 'Aluno é obrigatório'),

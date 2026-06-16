@@ -14,10 +14,14 @@ const cpfRegex = /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/;
 
 const schema = z.object({
   nome: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
+  email: z.string().email('E-mail inválido'),
+  senha: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
   cpf: z.string().regex(cpfRegex, 'CPF inválido (ex: 123.456.789-01)'),
   departamento: z.string().min(2, 'Departamento deve ter ao menos 2 caracteres'),
   instituicaoId: z.string().min(1, 'Selecione uma instituição'),
 });
+
+const schemaEdit = schema.omit({ senha: true, email: true });
 
 type FormData = z.infer<typeof schema>;
 
@@ -39,7 +43,9 @@ export function ProfessorForm({ open, onClose, onSuccess, professor }: Professor
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<FormData>({
+    resolver: zodResolver(isEdit ? schemaEdit : schema),
+  });
 
   useEffect(() => {
     instituicaoService.findAll().then(setInstituicoes).catch(() => {});
@@ -50,20 +56,20 @@ export function ProfessorForm({ open, onClose, onSuccess, professor }: Professor
       reset(
         professor
           ? { nome: professor.nome, cpf: professor.cpf, departamento: professor.departamento, instituicaoId: professor.instituicaoId }
-          : { nome: '', cpf: '', departamento: '', instituicaoId: '' },
+          : { nome: '', email: '', senha: '', cpf: '', departamento: '', instituicaoId: '' },
       );
       setError('');
     }
   }, [open, professor, reset]);
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: FormData | z.infer<typeof schemaEdit>) => {
     setLoading(true);
     setError('');
     try {
       if (isEdit) {
         await professorService.update(professor.id, data);
       } else {
-        await professorService.create(data);
+        await professorService.create(data as FormData);
       }
       onSuccess();
       onClose();
@@ -94,6 +100,26 @@ export function ProfessorForm({ open, onClose, onSuccess, professor }: Professor
             required
             {...register('cpf')}
           />
+          {!isEdit && (
+            <>
+              <Input
+                label="E-mail de acesso"
+                type="email"
+                placeholder="professor@instituicao.edu.br"
+                error={errors.email?.message}
+                required
+                {...register('email')}
+              />
+              <Input
+                label="Senha de acesso"
+                type="password"
+                placeholder="Mínimo 6 caracteres"
+                error={errors.senha?.message}
+                required
+                {...register('senha')}
+              />
+            </>
+          )}
           <Input
             label="Departamento"
             placeholder="Ciência da Computação"

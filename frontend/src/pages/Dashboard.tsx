@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GraduationCap, Building2, School, Coins, Clock, BookOpen, Gift, ReceiptText, Users } from 'lucide-react';
+import { CoinAmount } from '../components/ui/CoinIcon';
 import { StatCard } from '../components/ui/StatCard';
 import { Spinner } from '../components/ui/Spinner';
 import { Badge } from '../components/ui/Badge';
@@ -24,7 +25,13 @@ function DashboardAluno() {
     <div className="space-y-6">
       <div className="card p-6 bg-gradient-to-br from-indigo-50 to-white border-indigo-100">
         <p className="text-sm text-indigo-600 font-medium">Seu saldo atual</p>
-        <p className="text-4xl font-bold text-indigo-800 mt-1">🪙 {saldo ?? 0} moedas</p>
+        <CoinAmount
+          amount={saldo ?? 0}
+          suffix="moedas"
+          className="text-4xl font-bold text-indigo-800 mt-1 gap-2"
+          iconClassName="text-indigo-600"
+          iconSize={32}
+        />
         <p className="text-slate-500 text-sm mt-2">Use suas moedas para resgatar vantagens de empresas parceiras.</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -45,12 +52,32 @@ function DashboardAluno() {
 
 function DashboardProfessor() {
   const { saldo } = useSaldo();
+  const [creditoMsg, setCreditoMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const valor = sessionStorage.getItem('credito_semestral');
+    if (valor) {
+      setCreditoMsg(`🎉 Você recebeu +${valor} moedas do crédito semestral!`);
+      sessionStorage.removeItem('credito_semestral');
+    }
+  }, []);
 
   return (
     <div className="space-y-6">
+      {creditoMsg && (
+        <div className="bg-emerald-50 text-emerald-800 text-sm px-4 py-3 rounded-xl border border-emerald-200">
+          {creditoMsg}
+        </div>
+      )}
       <div className="card p-6 bg-gradient-to-br from-amber-50 to-white border-amber-100">
         <p className="text-sm text-amber-600 font-medium">Saldo para distribuir</p>
-        <p className="text-4xl font-bold text-amber-800 mt-1">🪙 {saldo ?? 0} moedas</p>
+        <CoinAmount
+          amount={saldo ?? 0}
+          suffix="moedas"
+          className="text-4xl font-bold text-amber-800 mt-1 gap-2"
+          iconClassName="text-amber-600"
+          iconSize={32}
+        />
         <p className="text-slate-500 text-sm mt-2">Reconheça o mérito dos seus alunos enviando moedas.</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

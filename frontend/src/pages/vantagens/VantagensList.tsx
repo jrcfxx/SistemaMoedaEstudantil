@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Plus, Pencil, Trash2, Gift, ShoppingBag, Search } from 'lucide-react';
+import { CoinIcon } from '../../components/ui/CoinIcon';
 import { Button } from '../../components/ui/Button';
 import { Spinner } from '../../components/ui/Spinner';
 import { EmptyState } from '../../components/ui/EmptyState';
@@ -181,7 +182,8 @@ function VantagemCard({ vantagem: v, podeResgatar, podeGerir, onResgatar, onEdit
           </div>
         )}
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm border border-amber-200 text-amber-700 font-bold text-sm px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
-          🪙 {v.custoMoedas}
+          <CoinIcon className="text-amber-600" size={14} />
+          {v.custoMoedas}
         </div>
         {podeGerir && (
           <div className="absolute top-3 left-3 flex gap-1.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">

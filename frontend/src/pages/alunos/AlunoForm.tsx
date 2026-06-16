@@ -15,6 +15,7 @@ const cpfRegex = /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/;
 const schema = z.object({
   nome: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
   email: z.string().email('E-mail inválido'),
+  senha: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
   cpf: z.string().regex(cpfRegex, 'CPF inválido (ex: 123.456.789-01)'),
   rg: z.string().min(5, 'RG inválido'),
   endereco: z.string().min(5, 'Endereço deve ter ao menos 5 caracteres'),
@@ -22,7 +23,10 @@ const schema = z.object({
   instituicaoId: z.string().min(1, 'Selecione uma instituição'),
 });
 
+const schemaEdit = schema.omit({ senha: true });
+
 type FormData = z.infer<typeof schema>;
+type FormDataEdit = z.infer<typeof schemaEdit>;
 
 interface AlunoFormProps {
   open: boolean;
@@ -43,7 +47,7 @@ export function AlunoForm({ open, onClose, onSuccess, aluno }: AlunoFormProps) {
     reset,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(isEdit ? schemaEdit : schema),
     defaultValues: aluno
       ? {
           nome: aluno.nome,
@@ -74,7 +78,7 @@ export function AlunoForm({ open, onClose, onSuccess, aluno }: AlunoFormProps) {
               curso: aluno.curso,
               instituicaoId: aluno.instituicaoId,
             }
-          : { nome: '', email: '', cpf: '', rg: '', endereco: '', curso: '', instituicaoId: '' },
+          : { nome: '', email: '', senha: '', cpf: '', rg: '', endereco: '', curso: '', instituicaoId: '' },
       );
       setError('');
     }
@@ -119,6 +123,16 @@ export function AlunoForm({ open, onClose, onSuccess, aluno }: AlunoFormProps) {
             required
             {...register('email')}
           />
+          {!isEdit && (
+            <Input
+              label="Senha de acesso"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              error={errors.senha?.message}
+              required
+              {...register('senha')}
+            />
+          )}
           <Input
             label="CPF"
             placeholder="123.456.789-01"

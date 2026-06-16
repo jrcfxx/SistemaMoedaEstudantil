@@ -90,7 +90,7 @@ export function Sidebar() {
           <LogOut className="w-5 h-5 flex-shrink-0" />
           Sair
         </button>
-        <p className="text-indigo-500 text-xs text-center mt-3">Lab04S01 · PUC Minas</p>
+        <p className="text-indigo-500 text-xs text-center mt-3">Release 2 · Lab 04</p>
       </div>
     </aside>
   );

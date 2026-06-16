@@ -1,10 +1,12 @@
 import { z } from 'zod';
 
 const cnpjRegex = /^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/;
+const senhaSchema = z.string().min(6, 'Senha deve ter pelo menos 6 caracteres');
 
 export const createEmpresaParceiraSchema = z.object({
   nome: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
   email: z.string().email('E-mail inválido'),
+  senha: senhaSchema,
   cnpj: z.string().regex(cnpjRegex, 'CNPJ inválido (ex: 12345678000195 ou 12.345.678/0001-95)'),
   endereco: z.string().min(5, 'Endereço deve ter ao menos 5 caracteres'),
   telefone: z.string().optional(),
@@ -12,7 +14,7 @@ export const createEmpresaParceiraSchema = z.object({
 });
 
 export const updateEmpresaParceiraSchema = createEmpresaParceiraSchema
-  .omit({ status: true })
+  .omit({ senha: true, status: true })
   .partial()
   .extend({ status: z.enum(['ATIVA', 'INATIVA']).optional() });
 

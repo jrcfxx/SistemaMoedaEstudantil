@@ -99,15 +99,16 @@ model EmpresaParceira {
 }
 
 model Professor {
-  id            String   @id @default(cuid())
-  nome          String
-  cpf           String   @unique
-  departamento  String
-  saldoMoedas   Int      @default(1000)
-  instituicaoId String
-  usuarioId     String?  @unique
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  nome                  String
+  cpf                   String   @unique
+  departamento          String
+  saldoMoedas           Int      @default(1000)
+  ultimoCreditoSemestre String?
+  instituicaoId         String
+  usuarioId             String?  @unique
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   instituicao Instituicao      @relation(fields: [instituicaoId], references: [id])
   usuario     Usuario?         @relation(fields: [usuarioId], references: [id])

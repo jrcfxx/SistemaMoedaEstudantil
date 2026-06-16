@@ -1,6 +1,8 @@
+import { prisma } from '../lib/prisma';
 import { alunoRepository } from '../repositories/alunoRepository';
 import { instituicaoRepository } from '../repositories/instituicaoRepository';
 import { AppError } from '../middlewares/errorHandler';
+import { criarUsuario } from '../lib/createUsuario';
 import {
   CreateAlunoInput,
   UpdateAlunoInput,
@@ -13,8 +15,8 @@ function normalizeCpf(cpf: string): string {
 }
 
 export const alunoService = {
-  findAll: async (search?: string) => {
-    return alunoRepository.findAll(search);
+  findAll: async (search?: string, instituicaoId?: string) => {
+    return alunoRepository.findAll(search, instituicaoId);
   },
 
   findById: async (id: string) => {
@@ -30,19 +32,31 @@ export const alunoService = {
   },
 
   create: async (data: CreateAlunoInput) => {
-    const parsed = createAlunoSchema.parse(data);
-    parsed.cpf = normalizeCpf(parsed.cpf);
+    const { senha, ...perfil } = createAlunoSchema.parse(data);
+    perfil.cpf = normalizeCpf(perfil.cpf);
 
-    const instituicao = await instituicaoRepository.findById(parsed.instituicaoId);
+    const instituicao = await instituicaoRepository.findById(perfil.instituicaoId);
     if (!instituicao) throw new AppError('Instituição não encontrada', 404);
 
-    const emailExistente = await alunoRepository.findByEmail(parsed.email);
+    const emailExistente = await alunoRepository.findByEmail(perfil.email);
     if (emailExistente) throw new AppError('E-mail já cadastrado', 409);
 
-    const cpfExistente = await alunoRepository.findByCpf(parsed.cpf);
+    const cpfExistente = await alunoRepository.findByCpf(perfil.cpf);
     if (cpfExistente) throw new AppError('CPF já cadastrado', 409);
 
-    return alunoRepository.create(parsed);
+    return prisma.$transaction(async (tx) => {
+      const usuario = await criarUsuario(tx, {
+        nome: perfil.nome,
+        email: perfil.email,
+        senha,
+        tipo: 'ALUNO',
+      });
+
+      return tx.aluno.create({
+        data: { ...perfil, saldoMoedas: 0, usuarioId: usuario.id },
+        include: { instituicao: { select: { id: true, nome: true } } },
+      });
+    });
   },
 
   update: async (id: string, data: UpdateAlunoInput) => {
@@ -51,9 +65,7 @@ export const alunoService = {
     const aluno = await alunoRepository.findById(id);
     if (!aluno) throw new AppError('Aluno não encontrado', 404);
 
-    if (parsed.cpf) {
-      parsed.cpf = normalizeCpf(parsed.cpf);
-    }
+    if (parsed.cpf) parsed.cpf = normalizeCpf(parsed.cpf);
 
     if (parsed.email && parsed.email !== aluno.email) {
       const emailExistente = await alunoRepository.findByEmail(parsed.email);

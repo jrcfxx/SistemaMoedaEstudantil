@@ -1,19 +1,30 @@
 import { prisma } from '../lib/prisma';
 import { CreateAlunoInput, UpdateAlunoInput } from '../validators/alunoValidator';
+import { Prisma } from '@prisma/client';
+
+function buildWhere(search?: string, instituicaoId?: string): Prisma.AlunoWhereInput | undefined {
+  const searchFilter: Prisma.AlunoWhereInput | undefined = search
+    ? {
+        OR: [
+          { nome: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { cpf: { contains: search, mode: 'insensitive' } },
+          { curso: { contains: search, mode: 'insensitive' } },
+        ],
+      }
+    : undefined;
+
+  if (instituicaoId && searchFilter) {
+    return { AND: [{ instituicaoId }, searchFilter] };
+  }
+  if (instituicaoId) return { instituicaoId };
+  return searchFilter;
+}
 
 export const alunoRepository = {
-  findAll: (search?: string) => {
+  findAll: (search?: string, instituicaoId?: string) => {
     return prisma.aluno.findMany({
-      where: search
-        ? {
-            OR: [
-              { nome: { contains: search, mode: 'insensitive' } },
-              { email: { contains: search, mode: 'insensitive' } },
-              { cpf: { contains: search, mode: 'insensitive' } },
-              { curso: { contains: search, mode: 'insensitive' } },
-            ],
-          }
-        : undefined,
+      where: buildWhere(search, instituicaoId),
       include: { instituicao: { select: { id: true, nome: true } } },
       orderBy: { createdAt: 'desc' },
     });

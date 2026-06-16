@@ -15,6 +15,7 @@ export interface AuthUser {
 interface LoginResponse {
   token: string;
   usuario: AuthUser;
+  creditoSemestral?: { valor: number };
 }
 
 const TOKEN_KEY = 'auth_token';
@@ -33,7 +34,39 @@ export const authService = {
     const { data } = await api.post<LoginResponse>('/auth/login', { email, senha });
     localStorage.setItem(TOKEN_KEY, data.token);
     localStorage.setItem(USER_KEY, JSON.stringify(data.usuario));
-    // Busca perfil completo para obter alunoId/empresaId
+    if (data.creditoSemestral) {
+      sessionStorage.setItem('credito_semestral', String(data.creditoSemestral.valor));
+    }
+    return fetchAndStoreProfile(data.token).catch(() => data.usuario);
+  },
+
+  registerAluno: async (payload: {
+    nome: string;
+    email: string;
+    senha: string;
+    cpf: string;
+    rg: string;
+    endereco: string;
+    curso: string;
+    instituicaoId: string;
+  }): Promise<AuthUser> => {
+    const { data } = await api.post<LoginResponse>('/auth/register/aluno', payload);
+    localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(USER_KEY, JSON.stringify(data.usuario));
+    return fetchAndStoreProfile(data.token).catch(() => data.usuario);
+  },
+
+  registerEmpresa: async (payload: {
+    nome: string;
+    email: string;
+    senha: string;
+    cnpj: string;
+    endereco: string;
+    telefone?: string;
+  }): Promise<AuthUser> => {
+    const { data } = await api.post<LoginResponse>('/auth/register/empresa', payload);
+    localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(USER_KEY, JSON.stringify(data.usuario));
     return fetchAndStoreProfile(data.token).catch(() => data.usuario);
   },
 

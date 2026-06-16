@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AlertCircle, CheckCircle2, Coins } from 'lucide-react';
+import { CoinAmount } from '../../components/ui/CoinIcon';
 import { Modal } from '../../components/ui/Modal';
 import { Select } from '../../components/ui/Select';
 import { Button } from '../../components/ui/Button';
@@ -102,9 +103,12 @@ export function DistribuirMoedasModal({
         <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 flex items-center justify-between">
           <div>
             <p className="text-xs text-indigo-500 font-medium uppercase tracking-wide">Saldo disponível</p>
-            <p className="text-2xl font-bold text-indigo-700 mt-0.5">
-              🪙 {saldoAtual}
-            </p>
+            <CoinAmount
+              amount={saldoAtual}
+              className="text-2xl font-bold text-indigo-700 mt-0.5"
+              iconClassName="text-indigo-600"
+              iconSize={24}
+            />
           </div>
           <Coins className="w-8 h-8 text-indigo-300" />
         </div>
@@ -138,7 +142,12 @@ export function DistribuirMoedasModal({
               <p className={`text-xs mt-1 font-medium ${saldoInsuficiente ? 'text-red-600' : 'text-slate-500'}`}>
                 {saldoInsuficiente
                   ? `Saldo insuficiente — faltam ${Math.abs(saldoRestante)} moeda(s)`
-                  : `Saldo restante após envio: 🪙 ${saldoRestante}`}
+                  : (
+                    <span className="inline-flex items-center gap-1 flex-wrap">
+                      Saldo restante após envio:
+                      <CoinAmount amount={saldoRestante} iconSize={12} iconClassName="text-indigo-600" />
+                    </span>
+                  )}
               </p>
             )}
           </div>

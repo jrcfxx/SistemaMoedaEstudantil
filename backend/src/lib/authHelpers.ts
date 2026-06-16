@@ -49,6 +49,26 @@ export async function findProfessorIdByUsuarioId(usuarioId: string): Promise<str
   return professor.id;
 }
 
+export async function findProfessorByUsuarioId(usuarioId: string) {
+  const professor = await prisma.professor.findFirst({
+    where: { usuarioId },
+    select: { id: true, instituicaoId: true },
+  });
+  if (!professor) throw new AppError('Cadastro de professor não encontrado para este usuário', 404);
+  return professor;
+}
+
+export async function assertAlunoMesmaInstituicaoDoProfessor(
+  alunoInstituicaoId: string,
+  usuario?: RequestUser,
+): Promise<void> {
+  if (!usuario || usuario.tipo !== 'PROFESSOR') return;
+  const professor = await findProfessorByUsuarioId(usuario.sub);
+  if (professor.instituicaoId !== alunoInstituicaoId) {
+    throw new AppError('Acesso negado: aluno pertence a outra instituição', 403);
+  }
+}
+
 export async function assertProfessorAutorizado(professorId: string, usuario?: RequestUser): Promise<void> {
   if (!usuario || usuario.tipo !== 'PROFESSOR') return;
   const idAutorizado = await findProfessorIdByUsuarioId(usuario.sub);

@@ -2,6 +2,7 @@ import { User } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { useSaldo } from '../../contexts/SaldoContext';
+import { CoinIcon } from '../ui/CoinIcon';
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'Administrador',
@@ -73,7 +74,7 @@ export function Header() {
       <div className="flex items-center gap-3">
         {mostraSaldo && (
           <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-1.5">
-            <span className="text-lg leading-none">🪙</span>
+            <CoinIcon className="text-amber-600" size={20} />
             <div>
               <p className="text-xs text-amber-600 font-medium leading-none">
                 {user?.tipo === 'ALUNO' ? 'Seu saldo' : 'Para distribuir'}

@@ -1,5 +1,7 @@
+import { prisma } from '../lib/prisma';
 import { empresaParceiraRepository } from '../repositories/empresaParceiraRepository';
 import { AppError } from '../middlewares/errorHandler';
+import { criarUsuario } from '../lib/createUsuario';
 import { assertEmpresaAutorizada, RequestUser } from '../lib/authHelpers';
 import {
   CreateEmpresaParceiraInput,
@@ -24,16 +26,27 @@ export const empresaParceiraService = {
   },
 
   create: async (data: CreateEmpresaParceiraInput) => {
-    const parsed = createEmpresaParceiraSchema.parse(data);
-    parsed.cnpj = normalizeCnpj(parsed.cnpj);
+    const { senha, ...perfil } = createEmpresaParceiraSchema.parse(data);
+    perfil.cnpj = normalizeCnpj(perfil.cnpj);
 
-    const emailExistente = await empresaParceiraRepository.findByEmail(parsed.email);
+    const emailExistente = await empresaParceiraRepository.findByEmail(perfil.email);
     if (emailExistente) throw new AppError('E-mail já cadastrado', 409);
 
-    const cnpjExistente = await empresaParceiraRepository.findByCnpj(parsed.cnpj);
+    const cnpjExistente = await empresaParceiraRepository.findByCnpj(perfil.cnpj);
     if (cnpjExistente) throw new AppError('CNPJ já cadastrado', 409);
 
-    return empresaParceiraRepository.create(parsed);
+    return prisma.$transaction(async (tx) => {
+      const usuario = await criarUsuario(tx, {
+        nome: perfil.nome,
+        email: perfil.email,
+        senha,
+        tipo: 'EMPRESA',
+      });
+
+      return tx.empresaParceira.create({
+        data: { ...perfil, usuarioId: usuario.id },
+      });
+    });
   },
 
   update: async (id: string, data: UpdateEmpresaParceiraInput, usuario?: RequestUser) => {
@@ -44,9 +57,7 @@ export const empresaParceiraService = {
     const empresa = await empresaParceiraRepository.findById(id);
     if (!empresa) throw new AppError('Empresa parceira não encontrada', 404);
 
-    if (parsed.cnpj) {
-      parsed.cnpj = normalizeCnpj(parsed.cnpj);
-    }
+    if (parsed.cnpj) parsed.cnpj = normalizeCnpj(parsed.cnpj);
 
     if (parsed.email && parsed.email !== empresa.email) {
       const emailExistente = await empresaParceiraRepository.findByEmail(parsed.email);

@@ -14,11 +14,14 @@ const cnpjRegex = /^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/;
 const schema = z.object({
   nome: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
   email: z.string().email('E-mail inválido'),
+  senha: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
   cnpj: z.string().regex(cnpjRegex, 'CNPJ inválido (ex: 12.345.678/0001-95)'),
   endereco: z.string().min(5, 'Endereço deve ter ao menos 5 caracteres'),
   telefone: z.string().optional(),
   status: z.enum(['ATIVA', 'INATIVA']).optional().default('ATIVA'),
 });
+
+const schemaEdit = schema.omit({ senha: true });
 
 type FormData = z.infer<typeof schema>;
 
@@ -40,7 +43,7 @@ export function EmpresaForm({ open, onClose, onSuccess, empresa }: EmpresaFormPr
     reset,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(isEdit ? schemaEdit : schema),
   });
 
   useEffect(() => {
@@ -55,20 +58,20 @@ export function EmpresaForm({ open, onClose, onSuccess, empresa }: EmpresaFormPr
               telefone: empresa.telefone ?? '',
               status: empresa.status,
             }
-          : { nome: '', email: '', cnpj: '', endereco: '', telefone: '', status: 'ATIVA' },
+          : { nome: '', email: '', senha: '', cnpj: '', endereco: '', telefone: '', status: 'ATIVA' },
       );
       setError('');
     }
   }, [open, empresa, reset]);
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: FormData | z.infer<typeof schemaEdit>) => {
     setLoading(true);
     setError('');
     try {
       if (isEdit) {
         await empresaService.update(empresa.id, data);
       } else {
-        await empresaService.create(data);
+        await empresaService.create(data as FormData);
       }
       onSuccess();
       onClose();
@@ -105,6 +108,16 @@ export function EmpresaForm({ open, onClose, onSuccess, empresa }: EmpresaFormPr
             required
             {...register('email')}
           />
+          {!isEdit && (
+            <Input
+              label="Senha de acesso"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              error={errors.senha?.message}
+              required
+              {...register('senha')}
+            />
+          )}
           <Input
             label="CNPJ"
             placeholder="12.345.678/0001-95"

@@ -1,6 +1,7 @@
 import { useState, FormEvent, lazy, Suspense } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { CoinIcon } from '../components/ui/CoinIcon';
 import { authService } from '../services/authService';
 
 const ModelViewer = lazy(() => import('../components/ui/ModelViewer'));
@@ -88,7 +89,7 @@ export default function Login() {
           {/* Ícone mobile */}
           <div className="flex lg:hidden justify-center mb-6">
             <div className="bg-primary-100 p-4 rounded-2xl">
-              <span className="text-3xl">🪙</span>
+              <CoinIcon className="text-primary-600" size={36} />
             </div>
           </div>
 
@@ -145,7 +146,12 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="text-center text-xs text-slate-500 mt-8">
+          <p className="text-center text-sm text-slate-500 mt-6">
+            Não tem conta?{' '}
+            <Link to="/register" className="text-indigo-600 font-medium hover:underline">Cadastre-se</Link>
+          </p>
+
+          <p className="text-center text-xs text-slate-500 mt-4">
             Sistema de Moeda Estudantil · PUC Minas
           </p>
         </div>

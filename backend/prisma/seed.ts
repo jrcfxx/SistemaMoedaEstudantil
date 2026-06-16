@@ -56,6 +56,7 @@ async function main() {
       cpf: '11122233344',
       departamento: 'Ciência da Computação',
       saldoMoedas: 1000,
+      ultimoCreditoSemestre: `${new Date().getFullYear()}-${new Date().getMonth() < 6 ? 1 : 2}`,
       instituicaoId: puc.id,
       usuarioId: usuarioProfessor.id,
     },
