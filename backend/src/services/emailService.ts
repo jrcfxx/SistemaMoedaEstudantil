@@ -1,5 +1,6 @@
 import nodemailer, { Transporter } from 'nodemailer';
 import { escapeHtml } from '../lib/escapeHtml';
+import { gerarQrCodeDataUrl } from '../lib/qrCode';
 
 let transporter: Transporter | null = null;
 
@@ -112,6 +113,8 @@ export const emailService = {
   },
 
   async enviarResgateRealizado(payload: EmailResgateRealizado): Promise<void> {
+    const qrCodeDataUrl = await gerarQrCodeDataUrl(payload.codigoCupom);
+
     const htmlAluno = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
@@ -122,9 +125,10 @@ export const emailService = {
           <p style="color: #334155; font-size: 16px;">Olá, <strong>${h(payload.nomeAluno)}</strong>!</p>
           <p style="color: #64748b;">Seu resgate da vantagem <strong>${h(payload.tituloVantagem)}</strong> foi confirmado.</p>
           <div style="background: #eef2ff; border: 2px dashed #818cf8; border-radius: 12px; padding: 24px; margin: 20px 0; text-align: center;">
+            <img src="${qrCodeDataUrl}" alt="QR Code do cupom" width="180" height="180" style="display: block; margin: 0 auto 16px; border-radius: 8px; background: white; padding: 8px;" />
             <p style="color: #6366f1; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin: 0;">Código do Cupom</p>
             <p style="color: #312e81; font-size: 28px; font-weight: bold; font-family: monospace; letter-spacing: 4px; margin: 10px 0;">${h(payload.codigoCupom)}</p>
-            <p style="color: #6366f1; font-size: 12px; margin: 0;">Apresente este código para resgatar sua vantagem</p>
+            <p style="color: #6366f1; font-size: 12px; margin: 0;">Apresente o QR Code ou este código para resgatar sua vantagem</p>
           </div>
           <p style="color: #64748b;"><strong>Parceiro:</strong> ${h(payload.nomeEmpresa)}</p>
           <p style="color: #64748b;"><strong>Custo:</strong> 🪙 ${payload.custoMoedas} moedas</p>

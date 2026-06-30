@@ -8,6 +8,7 @@ import { alunoService } from '../../services/alunoService';
 import { authService } from '../../services/authService';
 import { useSaldo } from '../../contexts/SaldoContext';
 import { api } from '../../services/api';
+import { CupomQrCode } from '../../components/ui/CupomQrCode';
 import { Vantagem, Resgate } from '../../types';
 
 type Etapa = 'confirmar' | 'sucesso';
@@ -198,11 +199,18 @@ export function ResgateModal({ open, vantagem, onClose }: ResgateModalProps) {
             </div>
             <div>
               <h3 className="text-lg font-bold text-slate-800">Resgate realizado!</h3>
-              <p className="text-slate-500 text-sm mt-1">Apresente o código abaixo na troca presencial.</p>
+              <p className="text-slate-500 text-sm mt-1">Apresente o QR Code ou o código abaixo na troca presencial.</p>
             </div>
           </div>
 
           <div className="bg-indigo-50 border-2 border-dashed border-indigo-300 rounded-2xl px-6 py-5">
+            {resgate?.codigoCupom && (
+              <div className="flex justify-center mb-4">
+                <div className="bg-white p-3 rounded-xl shadow-sm border border-indigo-100">
+                  <CupomQrCode codigoCupom={resgate.codigoCupom} size={180} />
+                </div>
+              </div>
+            )}
             <p className="text-xs text-indigo-400 font-semibold uppercase tracking-widest mb-2">Código do Cupom</p>
             <p className="font-mono text-2xl font-bold text-indigo-700 tracking-widest">{resgate?.codigoCupom}</p>
             <button

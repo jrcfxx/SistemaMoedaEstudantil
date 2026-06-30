@@ -6,6 +6,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { alunoService } from '../../services/alunoService';
 import { vantagemService } from '../../services/vantagemService';
 import { authService } from '../../services/authService';
+import { CupomQrCode } from '../../components/ui/CupomQrCode';
 import { TransacaoMoeda, Resgate } from '../../types';
 
 const TIPO_CONFIG = {
@@ -170,9 +171,12 @@ export default function ExtratoAluno() {
                     )}
                     <p className="text-xs text-slate-400 mt-1">{formatDate(r.createdAt)}</p>
                   </div>
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right flex-shrink-0 flex flex-col items-end gap-2">
+                    <div className="bg-white p-1.5 rounded-lg border border-indigo-100 shadow-sm">
+                      <CupomQrCode codigoCupom={r.codigoCupom} size={72} />
+                    </div>
                     <span
-                      className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5 ${STATUS_CUPOM[r.status]?.className ?? STATUS_CUPOM.PENDENTE.className}`}
+                      className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${STATUS_CUPOM[r.status]?.className ?? STATUS_CUPOM.PENDENTE.className}`}
                     >
                       {STATUS_CUPOM[r.status]?.label ?? r.status}
                     </span>
