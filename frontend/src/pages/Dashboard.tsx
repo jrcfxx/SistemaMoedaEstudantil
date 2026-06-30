@@ -205,9 +205,18 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, [user?.tipo]);
 
-  if (user?.tipo === 'ALUNO') return <DashboardAluno />;
-  if (user?.tipo === 'PROFESSOR') return <DashboardProfessor />;
-  if (user?.tipo === 'EMPRESA') return <DashboardEmpresa />;
+  if (!user?.tipo) {
+    return (
+      <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-6 text-sm space-y-2">
+        <p className="font-medium">Não foi possível carregar seu perfil.</p>
+        <p>Verifique se o backend está no ar e se a variável <code className="text-xs bg-amber-100 px-1 rounded">VITE_API_URL</code> está configurada no Render. Depois, saia e entre novamente.</p>
+      </div>
+    );
+  }
+
+  if (user.tipo === 'ALUNO') return <DashboardAluno />;
+  if (user.tipo === 'PROFESSOR') return <DashboardProfessor />;
+  if (user.tipo === 'EMPRESA') return <DashboardEmpresa />;
 
   if (loading) return <Spinner message="Carregando dashboard..." />;
 
@@ -217,7 +226,13 @@ export default function Dashboard() {
     );
   }
 
-  if (!stats) return null;
+  if (!stats) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-6 text-sm">
+        Não foi possível carregar os dados do dashboard.
+      </div>
+    );
+  }
 
   return <DashboardAdmin stats={stats} />;
 }

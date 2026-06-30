@@ -82,6 +82,16 @@ export const authService = {
     return fetchAndStoreProfile(data.token).catch(() => data.usuario);
   },
 
+  refreshProfile: async (): Promise<AuthUser | null> => {
+    const token = authService.getToken();
+    if (!token) return null;
+    try {
+      return await fetchAndStoreProfile(token);
+    } catch {
+      return authService.getUser();
+    }
+  },
+
   logout: (): void => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
